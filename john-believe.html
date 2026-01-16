@@ -136,37 +136,34 @@
             transform: translateY(-2px);
         }
 
+        /* 簡約文字懸浮按鈕 */
         .home-btn {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            width: 60px;
-            height: 60px;
+            padding: 12px 22px;
             background-color: var(--john-dark);
             color: var(--john-gold);
-            border: 2px solid var(--john-gold);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border: 1px solid var(--john-gold);
+            border-radius: 4px;
             text-decoration: none;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             z-index: 1000;
             transition: all 0.3s ease;
             font-family: 'Arial', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .home-btn:hover {
-            transform: scale(1.1);
+            transform: translateY(-5px);
             background-color: var(--john-gold);
             color: white;
-        }
-
-        .home-btn span {
-            font-size: 10px;
-            position: absolute;
-            bottom: 8px;
-            font-weight: bold;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
         }
 
         footer {
@@ -179,17 +176,18 @@
         }
 
         @media (max-width: 600px) {
-            .home-btn { bottom: 20px; right: 20px; width: 50px; height: 50px; }
-            .home-btn span { font-size: 8px; }
+            .home-btn { 
+                bottom: 20px; 
+                right: 20px; 
+                padding: 10px 18px;
+                font-size: 0.75rem;
+            }
         }
     </style>
 </head>
 <body>
 
-<a href="index.html" class="home-btn" title="Back to Main">
-    🏠
-    <span>HOME</span>
-</a>
+<a href="index.html" class="home-btn" title="Back to Main">HOME</a>
 
 <div class="overlay">
     <header class="header">
