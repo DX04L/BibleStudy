@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>以斯帖記系列：聽天不由命 X 我為此而生</title>
+    
+    <style>
+        :root {
+            /* 提取自圖片的色調 */
+            --esther-gold: #d4af37;
+            --esther-pink: #f8c2d1;
+            --esther-dark-pink: #e91e63;
+            --esther-navy: #1a237e;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #4a4a4a;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-main);
+            background-color: var(--esther-pink); /* 備用底色 */
+            background-image: url('Esther_bg.jpg'); 
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            background-size: cover;
+            line-height: 1.6;
+        }
+
+        .overlay {
+            background: rgba(255, 255, 255, 0.2); /* 較淺的遮罩，配合明亮底圖 */
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            text-shadow: 1px 1px 10px rgba(255,255,255,0.8);
+        }
+
+        .header h1 { 
+            font-size: clamp(2.4rem, 6vw, 3.6rem); 
+            margin: 0; 
+            color: var(--esther-dark-pink); 
+            line-height: 1.1;
+            letter-spacing: 4px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .header p { 
+            font-size: clamp(1rem, 2.5vw, 1.4rem); 
+            margin-top: 15px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: var(--esther-navy);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .sermon-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(233, 30, 99, 0.15);
+            border-left: 10px solid var(--esther-gold);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .sermon-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .sermon-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(233, 30, 99, 0.25);
+        }
+
+        .chapter-num {
+            color: var(--esther-dark-pink);
+            font-weight: 800;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+
+        .sermon-title {
+            font-size: 1.6rem;
+            margin: 0 0 12px 0;
+            color: var(--esther-navy);
+            font-weight: 700;
+        }
+
+        .description {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            border-bottom: 1px dashed var(--esther-pink);
+            padding-bottom: 15px;
+        }
+
+        /* 按鈕區域 */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .play-button {
+            flex: 1;
+            min-width: 140px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--esther-navy);
+            color: white;
+            text-decoration: none;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .play-button:hover {
+            background-color: var(--esther-dark-pink);
+            transform: scale(1.03);
+        }
+
+        .play-button::before {
+            content: '▶';
+            margin-right: 8px;
+            font-size: 0.8rem;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--esther-navy);
+            padding: 60px 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="overlay">
+    <header class="header">
+        <h1>ESTHER</h1>
+        <p>聽天不由命 X 我為此而生</p>
+    </header>
+
+    <div class="container" id="sermon-container">
+        </div>
+
+    <footer>
+        <p>📖『以斯帖記』信息彙整 | 榮耀歸給上帝</p>
+    </footer>
+</div>
+
+<script>
+    const sermons = [
+        {
+            chapter: "SERIES 01",
+            title: "1. 以斯帖記 1 [介紹]",
+            desc: "聽天不由命｜神你在哪裡？",
+            links: [
+                { label: "收聽信息 (上)", url: "https://tinyurl.com/CLCSeniors-Sermon250227" },
+                { label: "收聽信息 (下)", url: "https://tinyurl.com/CLCSeniors-Sermon250327" }
+            ]
+        },
+        {
+            chapter: "SERIES 02",
+            title: "2. 以斯帖記 2 [1~2章]",
+            desc: "兩個荒宴｜荒唐世代跟隨神",
+            links: [
+                { label: "收聽信息", url: "https://tinyurl.com/CLCSeniors-Sermon250424" }
+            ]
+        },
+        {
+            chapter: "SERIES 03",
+            title: "3. 以斯帖記 3 [3~4章]",
+            desc: "黑色陰謀｜生命的關鍵抉擇",
+            links: [
+                { label: "收聽信息", url: "https://tinyurl.com/CLCSeniors-Sermon250626" }
+            ]
+        },
+        {
+            chapter: "SERIES 04",
+            title: "4. 以斯帖記 4 [5~7章]",
+            desc: "雙宴密謀｜神就在這裡！",
+            links: [
+                { label: "收聽信息", url: "https://tinyurl.com/CLCSeniors-Sermon250731" }
+            ]
+        },
+        {
+            chapter: "SERIES 05",
+            title: "5. 以斯帖記 5 [8章]",
+            desc: "扭轉乾坤｜人生的逆轉時刻",
+            links: [
+                { label: "收聽信息", url: "https://tinyurl.com/CLCSeniors-Sermon250918" }
+            ]
+        },
+        {
+            chapter: "SERIES 06",
+            title: "6. 以斯帖記 6 [9~10章]",
+            desc: "兩個華宴｜穿越世代的命定",
+            links: [
+                { label: "收聽信息 (上)", url: "https://tinyurl.com/CLCSeniors-Sermon251016" },
+                { label: "收聽信息 (下)", url: "https://tinyurl.com/CLCSeniors-Sermon251030" }
+            ]
+        },
+        {
+            chapter: "SERIES 07",
+            title: "7. 以斯帖記 7 [總結]",
+            desc: "我為此而生｜Jesus",
+            links: [
+                { label: "收聽信息", url: "https://tinyurl.com/CLCSeniors-Sermon251113" }
+            ]
+        }
+    ];
+
+    function renderSermons() {
+        const container = document.getElementById('sermon-container');
+        container.innerHTML = sermons.map((s, index) => `
+            <div class="sermon-card" style="transition-delay: ${index * 0.1}s">
+                <span class="chapter-num">${s.chapter}</span>
+                <h2 class="sermon-title">${s.title}</h2>
+                <p class="description">${s.desc}</p>
+                <div class="button-group">
+                    ${s.links.map(link => `
+                        <a href="${link.url}" class="play-button" target="_blank">${link.label}</a>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+
+        setTimeout(() => {
+            document.querySelectorAll('.sermon-card').forEach(card => card.classList.add('visible'));
+        }, 100);
+    }
+
+    window.onload = renderSermons;
+</script>
+
+</body>
+</html>
