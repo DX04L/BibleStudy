@@ -38,6 +38,7 @@
 
         .header h1 {
             font-family: 'Arial', sans-serif;
+            /* 保持主標題大小 */
             font-size: clamp(2.5rem, 8vw, 4rem);
             margin: 0;
             letter-spacing: 0; 
@@ -47,14 +48,13 @@
 
         .header p {
             font-family: 'Arial', sans-serif;
-            /* 修改點：調整為原本大小的 70% (1.1rem * 0.7 = 0.77rem) */
-            font-size: 0.77rem; 
-            opacity: 0.8;
-            margin-top: 10px;
+            /* 修改點：設定為 50% 的主標題大小 (約 1.25rem - 2rem 之間動態縮放) */
+            font-size: clamp(1.25rem, 4vw, 2rem); 
+            opacity: 0.9;
+            margin-top: 15px;
             color: var(--lv-beige);
             letter-spacing: 2px;
-            font-weight: 400;
-            text-transform: uppercase;
+            font-weight: 600;
         }
 
         .container {
