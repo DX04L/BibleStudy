@@ -1,3 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>約翰福音系列 | Bible Study</title>
+    
+    <style>
+        :root {
+            --john-gold: #d4af37;
+            --john-dark: #1a1a1a;
+            --glass-white: rgba(255, 255, 255, 0.95);
+            --text-main: #333;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Arial', 'Helvetica', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-main);
+            background-color: #f5f5f5;
+            background-image: url('John-Believe_bg.jpg'); 
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            background-size: cover;
+            line-height: 1.6;
+        }
+
+        .overlay {
+            background: rgba(0, 0, 0, 0.3); 
+            min-height: 100vh;
+            padding: 60px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 { 
+            font-family: 'Arial', sans-serif;
+            font-size: clamp(2.4rem, 6vw, 3.8rem); 
+            margin: 0; 
+            color: #ffffff; 
+            line-height: 1.1;
+            letter-spacing: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .header p { 
+            font-size: clamp(1rem, 2.5vw, 1.4rem); 
+            margin-top: 15px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .sermon-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(8px);
+            border-radius: 4px;
+            padding: 35px;
+            margin-bottom: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border-left: 8px solid var(--john-gold);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .sermon-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .chapter-num {
+            font-family: 'Arial', sans-serif;
+            color: var(--john-gold);
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+
+        .sermon-title {
+            font-size: 1.6rem;
+            margin: 0 0 12px 0;
+            color: var(--john-dark);
+            font-weight: 700;
+        }
+
+        .description {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .play-button {
+            font-family: 'Arial', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--john-dark);
+            color: var(--john-gold);
+            text-decoration: none;
+            padding: 14px 24px;
+            border-radius: 2px;
+            border: 1px solid var(--john-gold);
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            width: 100%;
+            box-sizing: border-box;
+            text-transform: uppercase;
+        }
+
+        .play-button:hover {
+            background-color: var(--john-gold);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .home-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 12px 22px;
+            background-color: var(--john-dark);
+            color: var(--john-gold);
+            border: 1px solid var(--john-gold);
+            border-radius: 4px;
+            text-decoration: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            font-family: 'Arial', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .home-btn:hover {
+            transform: translateY(-5px);
+            background-color: var(--john-gold);
+            color: white;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+        }
+
+        footer {
+            text-align: center;
+            color: #ffffff;
+            padding: 60px 20px;
+            font-family: 'Arial', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+        }
+
+        @media (max-width: 600px) {
+            .home-btn { 
+                bottom: 20px; 
+                right: 20px; 
+                padding: 10px 18px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<a href="index.html" class="home-btn" title="Back to Main">HOME</a>
+
+<div class="overlay">
+    <header class="header">
+        <h1>BELIEVE</h1>
+        <p>約翰福音：Signs 神蹟 X I AM 真神</p>
+    </header>
+
+    <div class="container" id="sermon-container">
+        </div>
+
+    <footer>
+        <p>&copy; 2026 BIBLE STUDY PORTAL | JOHN SERIES</p>
+    </footer>
+</div>
+
 <script>
     const sermons = [
         {
@@ -15,13 +219,15 @@
         {
             chapter: "SIGN 02",
             title: "神蹟與真神 3｜神蹟 2：話語的力量",
-            desc: "大臣之子得醫治：看見信心如何建立在主的話語之上，超越時空的限制。",
+            desc: "看見信心如何建立在主的話語之上，超越時空的限制，使大臣之子痊癒。",
             url: "https://tinyurl.com/CLCSeniors-Sermon260326"
         }
     ];
 
     function renderSermons() {
         const container = document.getElementById('sermon-container');
+        if (!container) return;
+
         container.innerHTML = sermons.map((s, index) => `
             <div class="sermon-card" style="transition-delay: ${index * 0.1}s">
                 <span class="chapter-num">${s.chapter}</span>
@@ -31,6 +237,7 @@
             </div>
         `).join('');
 
+        // Trigger animation
         setTimeout(() => {
             document.querySelectorAll('.sermon-card').forEach(card => card.classList.add('visible'));
         }, 100);
@@ -38,3 +245,6 @@
 
     window.onload = renderSermons;
 </script>
+
+</body>
+</html>
