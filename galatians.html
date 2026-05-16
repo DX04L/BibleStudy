@@ -103,9 +103,18 @@
 
         .sermon-title {
             font-size: 1.55rem;
-            margin: 0 0 10px 0;
+            margin: 0 0 4px 0; /* 縮小底部間距，讓經文靠近標題 */
             color: #111;
             font-weight: 700;
+        }
+
+        /* 新增：經文的專屬樣式 */
+        .bible-verse {
+            font-size: 1.15rem;
+            color: #555;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            display: block;
         }
 
         .description {
@@ -208,8 +217,7 @@
         <p>正港的福音：加拉太書系列</p>
     </header>
 
-    <div class="container" id="sermon-container">
-        </div>
+    <div class="container" id="sermon-container"></div>
 
     <footer>
         <p>&copy; BIBLE STUDY PORTAL | GALATIANS SERIES</p>
@@ -217,16 +225,19 @@
 </div>
 
 <script>
+    // 在此直接獨立出 verse 欄位，並將 title 後方的方括號經文移除
     const sermons = [
         {
             chapter: "一. 信耶穌",
-            title: "1-1 只有一個福音 [加1:1-10]",
+            title: "1-1 只有一個福音",
+            verse: "📖加1:1-10",
             desc: "福音只有一個，任何改動都會使其失效。",
             links: [{ label: "LISTEN NOW", url: "https://tinyurl.com/CLCSeniors-Sermon230927" }]
         },
         {
             chapter: "一. 信耶穌",
-            title: "1-2 基督啟示的福音 [加1:11-2:14]",
+            title: "1-2 基督啟示的福音",
+            verse: "📖加1:11-2:14",
             desc: "福音並非出於人，而是直接由基督的啟示而來。",
             links: [
                 { label: "PART A", url: "https://tinyurl.com/CLCSeniors-Sermon231018" },
@@ -235,49 +246,57 @@
         },
         {
             chapter: "二. 新生命",
-            title: "2-1 因信稱義的新生命 [加2:15-21]",
+            title: "2-1 因信稱義的新生命",
+            verse: "📖加2:15-21",
             desc: "不是靠律法，而是靠信基督獲得新的生命地位。",
             links: [{ label: "LISTEN NOW", url: "https://tinyurl.com/CLCSeniors-Sermon240124v1" }]
         },
         {
             chapter: "二. 新生命",
-            title: "2-2 倚靠聖靈的新生命 [加3:1-18]",
+            title: "2-2 倚靠聖靈的新生命",
+            verse: "📖加3:1-18",
             desc: "新生命是靠聖靈入門，也應靠聖靈成全。",
             links: [{ label: "LISTEN NOW", url: "https://tinyurl.com/CLCSeniors-Sermon240320v1" }]
         },
         {
             chapter: "二. 新生命",
-            title: "2-3 做神兒女的新生命 [加3:19-4:11]",
+            title: "2-3 做神兒女的新生命",
+            verse: "📖加3:19-4:11",
             desc: "我們在基督裡不再是奴僕，而是擁有基業的兒女。",
             links: [{ label: "LISTEN NOW", url: "https://tinyurl.com/CLCSeniors-Sermon240425" }]
         },
         {
             chapter: "二. 新生命",
-            title: "2-4 基督成形的新生命 [加4:12-4:31]",
+            title: "2-4 基督成形的新生命",
+            verse: "📖加4:12-4:31",
             desc: "直到基督成形在你們心裡，這是新生命的目標。",
             links: [{ label: "LISTEN NOW", url: "https://tinyurl.com/CLCSeniors-Sermon240523" }]
         },
         {
             chapter: "三. 真自由",
-            title: "3-1 活出主愛的真自由 [加5:1-15]",
+            title: "3-1 活出主愛的真自由",
+            verse: "📖加5:1-15",
             desc: "自由不是放縱情慾，而是為了彼此服事。",
             links: [{ label: "LISTEN NOW", url: "https://tinyurl.com/CLCSeniors-Sermon240926" }]
         },
         {
             chapter: "三. 真自由",
-            title: "3-2 聖靈引導的真自由 [加5:16-26]",
+            title: "3-2 聖靈引導的真自由",
+            verse: "📖加5:16-26",
             desc: "順著聖靈而行，結出生命的美好果子。",
             links: [{ label: "LISTEN NOW", url: "https://tinyurl.com/CLCSeniors-Sermon241024" }]
         },
         {
             chapter: "三. 真自由",
-            title: "3-3 彼此擔當的真自由 [加6:1-10]",
+            title: "3-3 彼此擔當的真自由",
+            verse: "📖加6:1-10",
             desc: "重擔要彼此擔當，這就是完全了基督的律法。",
             links: [{ label: "LISTEN NOW", url: "https://tinyurl.com/CLCSeniors-Sermon241128" }]
         },
         {
             chapter: "四. 十字架",
-            title: "4 只有十字架 [加6:11-18]",
+            title: "4 只有十字架",
+            verse: "📖加6:11-18",
             desc: "斷不以別的誇口，只誇我們主耶穌基督的十字架。",
             links: [{ label: "LISTEN NOW", url: "https://tinyurl.com/CLCSeniors-Sermon250123" }]
         }
@@ -289,6 +308,7 @@
             <div class="sermon-card" style="transition-delay: ${index * 0.1}s">
                 <span class="chapter-num">${s.chapter}</span>
                 <h2 class="sermon-title">${s.title}</h2>
+                <span class="bible-verse">${s.verse}</span>
                 <p class="description">${s.desc}</p>
                 <div class="button-group">
                     ${s.links.map(link => `
