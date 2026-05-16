@@ -99,9 +99,18 @@
 
         .sermon-title {
             font-size: 1.5rem;
-            margin: 0 0 12px 0;
+            margin: 0 0 4px 0; /* 縮小底部間距，讓經文靠近標題 */
             color: #111;
             font-weight: 700;
+        }
+
+        /* 新增：經文的專屬樣式 */
+        .bible-verse {
+            font-size: 1.15rem;
+            color: #555;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            display: block;
         }
 
         .description {
@@ -193,8 +202,7 @@
         <p>約拿書系列：愛與給人機會的神</p>
     </header>
 
-    <div class="container" id="sermon-container">
-        </div>
+    <div class="container" id="sermon-container"></div>
 
     <footer>
         <p>&copy; BIBLE STUDY PORTAL | JONAH SERIES</p>
@@ -202,28 +210,33 @@
 </div>
 
 <script>
+    // 在此直接獨立出 verse 欄位，並將 title 後方的括號章節清除
     const sermons = [
         {
             chapter: "SERIES 01",
-            title: "1. 三十六計，走為下策（拿一）",
+            title: "1. 三十六計，走為下策",
+            verse: "📖拿一",
             desc: "違背神旨意的結果就是遇見風暴，也帶給身邊的人風暴。",
             url: "https://tinyurl.com/CLCSeniors-Sermon221012"
         },
         {
             chapter: "SERIES 02",
-            title: "2. 跑的了先知，躲不了神（拿二）",
+            title: "2. 跑的了先知，躲不了神",
+            verse: "📖拿二",
             desc: "神有絕對主權，救恩出於耶和華！",
             url: "https://tinyurl.com/CLCSeniors-Sermon221109"
         },
         {
             chapter: "SERIES 03",
-            title: "3. 呼召不改，本性要移（拿三）",
+            title: "3. 呼召不改，本性要移",
+            verse: "📖拿三",
             desc: "行動帶來恢復，悔改就帶來恩典。",
             url: "https://tinyurl.com/CLCSeniors-Sermon230628"
         },
         {
             chapter: "SERIES 04",
-            title: "4. 坐山觀審判，唯有神慈愛（拿四）",
+            title: "4. 坐山觀審判，唯有神慈愛",
+            verse: "📖拿四",
             desc: "上帝「愛」一切他所造的並給人悔改的「機會」，要藉著福音傳給萬民。",
             url: "https://tinyurl.com/CLCSeniors-Sermon230726"
         }
@@ -231,10 +244,13 @@
 
     function renderSermons() {
         const container = document.getElementById('sermon-container');
+        if (!container) return;
+        
         container.innerHTML = sermons.map((s, index) => `
             <div class="sermon-card" style="transition-delay: ${index * 0.1}s">
                 <span class="chapter-num">${s.chapter}</span>
                 <h2 class="sermon-title">${s.title}</h2>
+                <span class="bible-verse">${s.verse}</span>
                 <p class="description">${s.desc}</p>
                 <a href="${s.url}" class="play-button" target="_blank">Listen Now</a>
             </div>
