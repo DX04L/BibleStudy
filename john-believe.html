@@ -11,8 +11,6 @@
             --john-dark: #1a1a1a;
             --glass-white: rgba(255, 255, 255, 0.95);
             --text-main: #333;
-            --fb-color: #1877f2;
-            --line-color: #06c755;
         }
 
         html { 
@@ -109,9 +107,18 @@
 
         .sermon-title {
             font-size: 1.6rem;
-            margin: 0 0 12px 0;
+            margin: 0 0 4px 0; /* 縮小底部間距，讓經文靠近一點 */
             color: var(--john-dark);
             font-weight: 700;
+        }
+
+        /* 新增經文的樣式設定 */
+        .bible-verse {
+            font-size: 1.2rem;
+            color: #555;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            display: block;
         }
 
         .description {
@@ -120,14 +127,6 @@
             margin-bottom: 25px;
             border-bottom: 1px solid #eee;
             padding-bottom: 15px;
-        }
-
-        /* Actions Row Layout */
-        .card-actions {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: center;
         }
 
         .play-button {
@@ -145,8 +144,7 @@
             font-size: 0.9rem;
             letter-spacing: 1px;
             transition: 0.3s;
-            flex: 2;
-            min-width: 150px;
+            width: 100%;
             box-sizing: border-box;
             text-transform: uppercase;
         }
@@ -155,42 +153,6 @@
             background-color: var(--john-gold);
             color: white;
             transform: translateY(-2px);
-        }
-
-        /* Share Container & Buttons */
-        .share-group {
-            display: flex;
-            gap: 8px;
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .share-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            padding: 14px 10px;
-            border-radius: 2px;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: bold;
-            color: white;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .share-btn:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.1);
-        }
-
-        .share-fb { background-color: var(--fb-color); }
-        .share-line { background-color: var(--line-color); }
-        .share-link { 
-            background-color: #6c757d; 
-            font-family: 'Arial', sans-serif;
         }
 
         .home-btn {
@@ -232,41 +194,12 @@
             letter-spacing: 2px;
         }
 
-        /* Toast Notification for Link Copy */
-        .toast {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(0, 0, 0, 0.85);
-            color: #fff;
-            padding: 12px 24px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            z-index: 2000;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
-            opacity: 0;
-            pointer-events: none;
-            border: 1px solid var(--john-gold);
-        }
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
         @media (max-width: 600px) {
             .home-btn { 
                 bottom: 20px; 
                 right: 20px; 
                 padding: 10px 18px;
                 font-size: 0.75rem;
-            }
-            .card-actions {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .share-group {
-                width: 100%;
             }
         }
     </style>
@@ -288,37 +221,35 @@
     </footer>
 </div>
 
-<div id="toast" class="toast">連結已複製到剪貼簿！</div>
-
 <script>
     const sermons = [
         {
             chapter: "INTRODUCTION",
-            title: "神蹟與真神 1｜介紹：使你能相信（約20:31）",
+            title: "神蹟與真神 1｜介紹：使你能相信　約20:31",
             desc: "明白約翰福音的核心目的：叫你們信耶穌是基督，是神的兒子。",
             url: "https://tinyurl.com/CLCSeniors-Sermon251127"
         },
         {
             chapter: "SIGN 01",
-            title: "神蹟與真神 2｜神蹟一：好酒人生（約2:1-11）",
+            title: "神蹟與真神 2｜神蹟一：好酒人生　約2:1-11",
             desc: "人能相信，不只因為看見神蹟，而是因為經歷神的榮耀！",
             url: "https://tinyurl.com/CLCSeniors-Sermon260115"
         },
         {
             chapter: "SIGN 02",
-            title: "神蹟與真神 3｜神蹟二：超越時空的信心（約4:43-54）",
+            title: "神蹟與真神 3｜神蹟二：超越時空的信心　約4:43-54",
             desc: "我們相信，是因為在信心的行動中認識了耶穌！",
             url: "https://tinyurl.com/CLCSeniors-Sermon260326"
         },
         {
             chapter: "SIGN 03",
-            title: "神蹟與真神 4｜神蹟三：走出絕望的循環（約5:1-18）",
+            title: "神蹟與真神 4｜神蹟三：走出絕望的循環　約5:1-18",
             desc: "信靠耶穌，不要相信傳說！走出絕望的循環，在如今還為你做事的基督裡安息。",
             url: "https://drive.google.com/file/d/1QcxrBmDi-HecUKg0jsnSdzsKmEzIVIbe/view?usp=sharing"
         },
         {
             chapter: "SIGN 04",
-            title: "神蹟與真神 5｜神蹟四：不只是五餅二魚（約6:1-15）",
+            title: "神蹟與真神 5｜神蹟四：不只是五餅二魚 [約6:1-15]",
             desc: "Believe，因為耶穌要使你的生命豐富有餘，更要救你脫離罪的轄制！",
             url: "https://tinyurl.com/CLCSeniors-Sermon260514"
         }
@@ -329,27 +260,24 @@
         if (!container) return;
 
         container.innerHTML = sermons.map((s, index) => {
-            // Encode titles and URLs for sharing
-            const shareText = encodeURIComponent(`${s.title}\n${s.desc}\n`);
-            const shareUrl = encodeURIComponent(s.url);
+            // 使用正則表達式，自動尋找標題中的「約...」或「[約...」並切分開來
+            const match = s.title.match(/(.*?)(\[?約\d+:\d+-\d+\]?)/);
             
-            // Generate Social Share Links
-            const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
-            const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${shareUrl}&text=${shareText}`;
+            let displayTitle = s.title;
+            let displayVerse = "";
+
+            if (match) {
+                displayTitle = match[1].trim(); // 前半段的標題文字
+                displayVerse = match[2].replace(/[\[\]]/g, ''); // 後半段的經文，並移除左右方括號 []
+            }
 
             return `
                 <div class="sermon-card" style="transition-delay: ${index * 0.1}s">
                     <span class="chapter-num">${s.chapter}</span>
-                    <h2 class="sermon-title">${s.title}</h2>
+                    <h2 class="sermon-title">${displayTitle}</h2>
+                    ${displayVerse ? `<span class="bible-verse">📖${displayVerse}</span>` : ''}
                     <p class="description">${s.desc}</p>
-                    <div class="card-actions">
-                        <a href="${s.url}" class="play-button" target="_blank">Listen Now</a>
-                        <div class="share-group">
-                            <a href="${fbShareUrl}" class="share-btn share-fb" target="_blank" title="分享到 Facebook">FB</a>
-                            <a href="${lineShareUrl}" class="share-btn share-line" target="_blank" title="分享到 LINE">LINE</a>
-                            <button class="share-btn share-link" onclick="copyLink('${s.url}')" title="複製音訊連結">LINK</button>
-                        </div>
-                    </div>
+                    <a href="${s.url}" class="play-button" target="_blank">Listen Now</a>
                 </div>
             `;
         }).join('');
@@ -357,31 +285,6 @@
         setTimeout(() => {
             document.querySelectorAll('.sermon-card').forEach(card => card.classList.add('visible'));
         }, 100);
-    }
-
-    // Function to handle URL copying
-    function copyLink(url) {
-        navigator.clipboard.writeText(url).then(() => {
-            showToast();
-        }).catch(err => {
-            // Fallback for older browsers
-            const el = document.createElement('textarea');
-            el.value = url;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            showToast();
-        });
-    }
-
-    // Function to show custom toast message
-    function showToast() {
-        const toast = document.getElementById('toast');
-        toast.classList.add('show');
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 2500);
     }
 
     window.onload = renderSermons;
