@@ -100,9 +100,18 @@
 
         .sermon-title {
             font-size: 1.6rem;
-            margin: 0 0 12px 0;
+            margin: 0 0 4px 0; /* 縮小底部間距，讓經文靠近標題 */
             color: var(--esther-navy);
             font-weight: 700;
+        }
+
+        /* 新增：經文的專屬樣式 */
+        .bible-verse {
+            font-size: 1.15rem;
+            color: #555;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            display: block;
         }
 
         .description {
@@ -201,8 +210,7 @@
         <p>聽天不由命 X 我為此而生</p>
     </header>
 
-    <div class="container" id="sermon-container">
-        </div>
+    <div class="container" id="sermon-container"></div>
 
     <footer>
         <p>&copy; BIBLE STUDY PORTAL | ESTHER SERIES</p>
@@ -210,10 +218,12 @@
 </div>
 
 <script>
+    // 在此直接獨立出 verse 欄位，並將 title 後方的方括號經文清除
     const sermons = [
         {
             chapter: "SERIES 01",
-            title: "1. 以斯帖記 1 [介紹]",
+            title: "1. 聽天不由命",
+            verse: "📖斯1章",
             desc: "聽天不由命｜神你在哪裡？",
             links: [
                 { label: "PART A", url: "https://tinyurl.com/CLCSeniors-Sermon250227" },
@@ -222,7 +232,8 @@
         },
         {
             chapter: "SERIES 02",
-            title: "2. 以斯帖記 2 [1~2章]",
+            title: "2. 兩個荒宴",
+            verse: "📖斯1~2章",
             desc: "兩個荒宴｜荒唐世代跟隨神",
             links: [
                 { label: "LISTEN NOW", url: "https://tinyurl.com/CLCSeniors-Sermon250424" }
@@ -230,7 +241,8 @@
         },
         {
             chapter: "SERIES 03",
-            title: "3. 以斯帖記 3 [3~4章]",
+            title: "3. 黑色陰謀",
+            verse: "📖斯3~4章",
             desc: "黑色陰謀｜生命的關鍵抉擇",
             links: [
                 { label: "LISTEN NOW", url: "https://tinyurl.com/CLCSeniors-Sermon250626" }
@@ -238,7 +250,8 @@
         },
         {
             chapter: "SERIES 04",
-            title: "4. 以斯帖記 4 [5~7章]",
+            title: "4. 雙宴密謀",
+            verse: "📖斯5~7章",
             desc: "雙宴密謀｜神就在這裡！",
             links: [
                 { label: "LISTEN NOW", url: "https://tinyurl.com/CLCSeniors-Sermon250731" }
@@ -246,7 +259,8 @@
         },
         {
             chapter: "SERIES 05",
-            title: "5. 以斯帖記 5 [8章]",
+            title: "5. 扭轉乾坤",
+            verse: "📖斯8章",
             desc: "扭轉乾坤｜人生的逆轉時刻",
             links: [
                 { label: "LISTEN NOW", url: "https://tinyurl.com/CLCSeniors-Sermon250918" }
@@ -254,7 +268,8 @@
         },
         {
             chapter: "SERIES 06",
-            title: "6. 以斯帖記 6 [9~10章]",
+            title: "6. 兩個華宴",
+            verse: "📖斯9~10章",
             desc: "兩個華宴｜穿越世代的命定",
             links: [
                 { label: "PART A", url: "https://tinyurl.com/CLCSeniors-Sermon251016" },
@@ -263,7 +278,8 @@
         },
         {
             chapter: "SERIES 07",
-            title: "7. 以斯帖記 7 [總結]",
+            title: "7. 我為此而生",
+            verse: "📖斯總結",
             desc: "我為此而生｜Jesus",
             links: [
                 { label: "LISTEN NOW", url: "https://tinyurl.com/CLCSeniors-Sermon251113" }
@@ -277,6 +293,7 @@
             <div class="sermon-card" style="transition-delay: ${index * 0.1}s">
                 <span class="chapter-num">${s.chapter}</span>
                 <h2 class="sermon-title">${s.title}</h2>
+                <span class="bible-verse">${s.verse}</span>
                 <p class="description">${s.desc}</p>
                 <div class="button-group">
                     ${s.links.map(link => `
