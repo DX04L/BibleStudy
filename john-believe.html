@@ -129,6 +129,17 @@
             padding-bottom: 15px;
         }
 
+        /* 新增：內嵌音訊播放器樣式 */
+        .audio-player-container {
+            margin-top: 15px;
+            width: 100%;
+        }
+        
+        audio {
+            width: 100%;
+            outline: none;
+        }
+
         .play-button {
             font-family: 'Arial', sans-serif;
             display: inline-flex;
@@ -272,16 +283,29 @@
         const container = document.getElementById('sermon-container');
         if (!container) return;
 
-        // 這裡修改為直接抓取 s.verse 放入 HTML 中
-        container.innerHTML = sermons.map((s, index) => `
-            <div class="sermon-card" style="transition-delay: ${index * 0.1}s">
-                <span class="chapter-num">${s.chapter}</span>
-                <h2 class="sermon-title">${s.title}</h2>
-                <span class="bible-verse">${s.verse}</span>
-                <p class="description">${s.desc}</p>
-                <a href="${s.url}" class="play-button" target="_blank">Listen Now</a>
-            </div>
-        `).join('');
+        // 判斷網址是否為音訊檔，若是則渲染播放器，若否則保持按鈕
+        container.innerHTML = sermons.map((s, index) => {
+            const isAudio = s.url.endsWith('.mp3');
+            
+            const actionElement = isAudio 
+                ? `<div class="audio-player-container">
+                    <audio controls preload="none">
+                        <source src="${s.url}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                   </div>`
+                : `<a href="${s.url}" class="play-button" target="_blank">Listen Now</a>`;
+
+            return `
+                <div class="sermon-card" style="transition-delay: ${index * 0.1}s">
+                    <span class="chapter-num">${s.chapter}</span>
+                    <h2 class="sermon-title">${s.title}</h2>
+                    <span class="bible-verse">${s.verse}</span>
+                    <p class="description">${s.desc}</p>
+                    ${actionElement}
+                </div>
+            `;
+        }).join('');
 
         setTimeout(() => {
             document.querySelectorAll('.sermon-card').forEach(card => card.classList.add('visible'));
