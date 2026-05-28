@@ -316,7 +316,6 @@
         container.innerHTML = sermons.map((s, index) => {
             const isAudio = s.url.endsWith('.mp3');
             
-            // 這裡幫播放器多包一層選單，如果被攔截自動播放，可以塞入一個亮眼按鈕
             const actionElement = isAudio 
                 ? `<div class="audio-player-container" id="player-zone-${s.id}">
                     <audio id="audio-${s.id}" controls preload="auto">
@@ -352,30 +351,26 @@
             const playerZone = document.getElementById(`player-zone-${targetId}`);
             
             if (cardElement) {
-                // 不管能不能播，都先精準滾動到畫面上
                 cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 
                 if (audioElement) {
-                    // 移除任何舊的提示按鈕以防重複
                     const oldBtn = document.getElementById(`hint-btn-${targetId}`);
                     if (oldBtn) oldBtn.remove();
 
                     audioElement.play().catch(error => {
                         console.log("自動播放被瀏覽器政策攔截，生成引導按鈕。");
                         
-                        // 建立一個會呼吸發光的醒目按鈕，引導點擊
+                        // 建立修改為橘色發光且顯示 "▶ LISTEN NOW" 的引導按鈕
                         const hintBtn = document.createElement('button');
                         hintBtn.id = `hint-btn-${targetId}`;
                         hintBtn.className = 'play-button autoplay-hint-btn';
-                        hintBtn.innerHTML = '▶ 點擊此處立即播放講道';
+                        hintBtn.innerHTML = '▶ LISTEN NOW';
                         
-                        // 當點擊此提示按鈕，播放音樂並把按鈕自己藏起來
                         hintBtn.onclick = function() {
                             audioElement.play();
                             hintBtn.style.display = 'none';
                         };
                         
-                        // 將提示按鈕加在音訊軌上方
                         playerZone.insertBefore(hintBtn, audioElement);
                     });
                 }
@@ -384,7 +379,6 @@
     }
 
     window.onload = renderSermons;
-    // 解決重複點擊或變更 Hash 時不會動的問題
     window.onhashchange = handleAutoplayFromHash;
 </script>
 
