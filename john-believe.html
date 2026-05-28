@@ -96,7 +96,7 @@
 
         /* 讓被指定的講道卡片有微微的發光提示效果 */
         .sermon-card:target {
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.8);
             border-left-color: #ffffff;
             background: #ffffff;
         }
@@ -165,12 +165,30 @@
             width: 100%;
             box-sizing: border-box;
             text-transform: uppercase;
+            cursor: pointer;
         }
 
         .play-button:hover {
             background-color: var(--john-gold);
             color: white;
             transform: translateY(-2px);
+        }
+
+        /* 新增：被瀏覽器擋住自動播放時顯示的提示按鈕 */
+        .autoplay-hint-btn {
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            animation: pulse 1.5s infinite;
+        }
+        .autoplay-hint-btn:hover {
+            background-color: #d35400;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(230, 126, 34, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 126, 34, 0); }
         }
 
         .home-btn {
@@ -240,7 +258,6 @@
 </div>
 
 <script>
-    // 這裡直接新增了 id 欄位，方便做外部連結直接指定自動播放
     const sermons = [
         {
             id: "intro",
@@ -299,8 +316,9 @@
         container.innerHTML = sermons.map((s, index) => {
             const isAudio = s.url.endsWith('.mp3');
             
+            // 這裡幫播放器多包一層選單，如果被攔截自動播放，可以塞入一個亮眼按鈕
             const actionElement = isAudio 
-                ? `<div class="audio-player-container">
+                ? `<div class="audio-player-container" id="player-zone-${s.id}">
                     <audio id="audio-${s.id}" controls preload="auto">
                         <source src="${s.url}" type="audio/mpeg">
                         Your browser does not support the audio element.
@@ -321,27 +339,44 @@
 
         setTimeout(() => {
             document.querySelectorAll('.sermon-card').forEach(card => card.classList.add('visible'));
-            // 渲染完後，檢查網址有沒有包含指定的自動播放目標
             handleAutoplayFromHash();
         }, 100);
     }
 
-    // 新增：處理從網址連結進來自動播放的邏輯
     function handleAutoplayFromHash() {
-        const hash = window.location.hash; // 抓取如 #iam1-1
+        const hash = window.location.hash;
         if (hash) {
             const targetId = hash.replace('#', '');
             const audioElement = document.getElementById(`audio-${targetId}`);
             const cardElement = document.getElementById(targetId);
+            const playerZone = document.getElementById(`player-zone-${targetId}`);
             
             if (cardElement) {
-                // 自動平滑滾動到該卡片位置
+                // 不管能不能播，都先精準滾動到畫面上
                 cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 
-                // 如果該卡片有音訊播放器，嘗試執行自動播放
                 if (audioElement) {
+                    // 移除任何舊的提示按鈕以防重複
+                    const oldBtn = document.getElementById(`hint-btn-${targetId}`);
+                    if (oldBtn) oldBtn.remove();
+
                     audioElement.play().catch(error => {
-                        console.log("瀏覽器阻擋了初始自動播放，需使用者點擊網頁任意處或手動點擊播放：", error);
+                        console.log("自動播放被瀏覽器政策攔截，生成引導按鈕。");
+                        
+                        // 建立一個會呼吸發光的醒目按鈕，引導點擊
+                        const hintBtn = document.createElement('button');
+                        hintBtn.id = `hint-btn-${targetId}`;
+                        hintBtn.className = 'play-button autoplay-hint-btn';
+                        hintBtn.innerHTML = '▶ 點擊此處立即播放講道';
+                        
+                        // 當點擊此提示按鈕，播放音樂並把按鈕自己藏起來
+                        hintBtn.onclick = function() {
+                            audioElement.play();
+                            hintBtn.style.display = 'none';
+                        };
+                        
+                        // 將提示按鈕加在音訊軌上方
+                        playerZone.insertBefore(hintBtn, audioElement);
                     });
                 }
             }
@@ -349,7 +384,7 @@
     }
 
     window.onload = renderSermons;
-    // 當使用者已經在頁面中，點擊帶有不同 hash 的連結時也能觸發
+    // 解決重複點擊或變更 Hash 時不會動的問題
     window.onhashchange = handleAutoplayFromHash;
 </script>
 
