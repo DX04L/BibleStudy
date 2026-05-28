@@ -174,21 +174,22 @@
             transform: translateY(-2px);
         }
 
-        /* 新增：被瀏覽器擋住自動播放時顯示的提示按鈕 */
+        /* 修改：被瀏覽器擋住自動播放時顯示的提示按鈕（修正為原色系黑金搭配） */
         .autoplay-hint-btn {
-            background-color: #e67e22;
-            color: white;
-            border: none;
+            background-color: var(--john-dark);
+            color: var(--john-gold);
+            border: 1px solid var(--john-gold);
             animation: pulse 1.5s infinite;
         }
         .autoplay-hint-btn:hover {
-            background-color: #d35400;
+            background-color: var(--john-gold);
+            color: white;
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.7); }
-            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(230, 126, 34, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 126, 34, 0); }
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(214, 175, 55, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(214, 175, 55, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(214, 175, 55, 0); }
         }
 
         .home-btn {
@@ -265,7 +266,7 @@
             title: "神蹟與真神 1｜介紹：使你能相信",
             verse: "📖約20:31",
             desc: "明白約翰福音的核心目的：叫你們信耶穌是基督，是神的兒子。",
-            url: "https://tinyurl.com/CLCSeniors-Sermon251127"
+            url: "https://ia903107.us.archive.org/17/items/clcseniors-251127/CLCSeniors251127.mp3"
         },
         {
             id: "sign1",
@@ -360,7 +361,7 @@
                     audioElement.play().catch(error => {
                         console.log("自動播放被瀏覽器政策攔截，生成引導按鈕。");
                         
-                        // 建立修改為橘色發光且顯示 "▶ LISTEN NOW" 的引導按鈕
+                        // 建立修改為原主題色系且顯示 "▶ LISTEN NOW" 的引導按鈕
                         const hintBtn = document.createElement('button');
                         hintBtn.id = `hint-btn-${targetId}`;
                         hintBtn.className = 'play-button autoplay-hint-btn';
