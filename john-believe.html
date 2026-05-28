@@ -94,6 +94,13 @@
             transform: translateY(0);
         }
 
+        /* 讓被指定的講道卡片有微微的發光提示效果 */
+        .sermon-card:target {
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            border-left-color: #ffffff;
+            background: #ffffff;
+        }
+
         .chapter-num {
             font-family: 'Arial', sans-serif;
             color: var(--john-gold);
@@ -233,9 +240,10 @@
 </div>
 
 <script>
-    // 這裡直接新增了 verse 欄位，並把標題尾端的經文清除，乾淨又漂亮！
+    // 這裡直接新增了 id 欄位，方便做外部連結直接指定自動播放
     const sermons = [
         {
+            id: "intro",
             chapter: "INTRODUCTION",
             title: "神蹟與真神 1｜介紹：使你能相信",
             verse: "📖約20:31",
@@ -243,6 +251,7 @@
             url: "https://tinyurl.com/CLCSeniors-Sermon251127"
         },
         {
+            id: "sign1",
             chapter: "SIGN 01",
             title: "神蹟與真神 2｜神蹟一：好酒人生",
             verse: "📖約2:1-11",
@@ -250,6 +259,7 @@
             url: "https://tinyurl.com/CLCSeniors-Sermon260115"
         },
         {
+            id: "sign2",
             chapter: "SIGN 02",
             title: "神蹟與真神 3｜神蹟二：超越時空的信心",
             verse: "📖約4:43-54",
@@ -257,6 +267,7 @@
             url: "https://tinyurl.com/CLCSeniors-Sermon260326"
         },
         {
+            id: "sign3",
             chapter: "SIGN 03",
             title: "神蹟與真神 4｜神蹟三：走出絕望的循環",
             verse: "📖約5:1-18",
@@ -264,6 +275,7 @@
             url: "https://drive.google.com/file/d/1QcxrBmDi-HecUKg0jsnSdzsKmEzIVIbe/view?usp=sharing"
         },
         {
+            id: "sign4",
             chapter: "SIGN 04",
             title: "神蹟與真神 5｜神蹟四：不只是五餅二魚",
             verse: "📖約6:1-15",
@@ -271,6 +283,7 @@
             url: "https://tinyurl.com/CLCSeniors-Sermon260514"
         },
         {
+            id: "iam1-1",
             chapter: "I AM 01-1",
             title: "神蹟與真神 6｜神蹟四：真神宣告一：我就是生命的糧(上)",
             verse: "📖約6:25-59",
@@ -283,13 +296,12 @@
         const container = document.getElementById('sermon-container');
         if (!container) return;
 
-        // 判斷網址是否為音訊檔，若是則渲染播放器，若否則保持按鈕
         container.innerHTML = sermons.map((s, index) => {
             const isAudio = s.url.endsWith('.mp3');
             
             const actionElement = isAudio 
                 ? `<div class="audio-player-container">
-                    <audio controls preload="none">
+                    <audio id="audio-${s.id}" controls preload="auto">
                         <source src="${s.url}" type="audio/mpeg">
                         Your browser does not support the audio element.
                     </audio>
@@ -297,7 +309,7 @@
                 : `<a href="${s.url}" class="play-button" target="_blank">Listen Now</a>`;
 
             return `
-                <div class="sermon-card" style="transition-delay: ${index * 0.1}s">
+                <div class="sermon-card" id="${s.id}" style="transition-delay: ${index * 0.1}s">
                     <span class="chapter-num">${s.chapter}</span>
                     <h2 class="sermon-title">${s.title}</h2>
                     <span class="bible-verse">${s.verse}</span>
@@ -309,10 +321,36 @@
 
         setTimeout(() => {
             document.querySelectorAll('.sermon-card').forEach(card => card.classList.add('visible'));
+            // 渲染完後，檢查網址有沒有包含指定的自動播放目標
+            handleAutoplayFromHash();
         }, 100);
     }
 
+    // 新增：處理從網址連結進來自動播放的邏輯
+    function handleAutoplayFromHash() {
+        const hash = window.location.hash; // 抓取如 #iam1-1
+        if (hash) {
+            const targetId = hash.replace('#', '');
+            const audioElement = document.getElementById(`audio-${targetId}`);
+            const cardElement = document.getElementById(targetId);
+            
+            if (cardElement) {
+                // 自動平滑滾動到該卡片位置
+                cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // 如果該卡片有音訊播放器，嘗試執行自動播放
+                if (audioElement) {
+                    audioElement.play().catch(error => {
+                        console.log("瀏覽器阻擋了初始自動播放，需使用者點擊網頁任意處或手動點擊播放：", error);
+                    });
+                }
+            }
+        }
+    }
+
     window.onload = renderSermons;
+    // 當使用者已經在頁面中，點擊帶有不同 hash 的連結時也能觸發
+    window.onhashchange = handleAutoplayFromHash;
 </script>
 
 </body>
