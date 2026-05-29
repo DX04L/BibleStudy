@@ -86,6 +86,13 @@
             transform: translateY(0);
         }
 
+        /* 讓被指定的講道卡片有微微的發光提示效果 */
+        .sermon-card:target {
+            box-shadow: 0 0 25px rgba(214, 175, 55, 0.8);
+            border-left-color: #ffffff;
+            background: #ffffff;
+        }
+
         .chapter-num {
             font-family: 'Arial', sans-serif;
             color: var(--ocean-blue);
@@ -119,6 +126,17 @@
             margin-bottom: 25px;
         }
 
+        /* 新增：內嵌音訊播放器樣式 */
+        .audio-player-container {
+            margin-top: 15px;
+            width: 100%;
+        }
+        
+        audio {
+            width: 100%;
+            outline: none;
+        }
+
         .play-button {
             font-family: 'Arial', sans-serif;
             display: inline-flex;
@@ -129,18 +147,38 @@
             text-decoration: none;
             padding: 12px 24px;
             border-radius: 50px;
+            border: 1px solid transparent;
             font-weight: 600;
             font-size: 1rem;
             transition: all 0.3s ease;
             width: 100%;
             box-sizing: border-box;
             text-transform: uppercase;
+            cursor: pointer;
         }
 
         .play-button:hover {
             background-color: #2c5d75;
             box-shadow: 0 5px 15px rgba(26, 58, 74, 0.4);
             transform: scale(1.02);
+        }
+
+        /* 新增：被瀏覽器擋住自動播放時顯示的提示按鈕（維持原色系海洋藍與金邊） */
+        .autoplay-hint-btn {
+            background-color: var(--ocean-blue);
+            color: var(--gold-accent);
+            border: 1px solid var(--gold-accent);
+            animation: pulse 1.5s infinite;
+        }
+        .autoplay-hint-btn:hover {
+            background-color: var(--gold-accent);
+            color: white;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(214, 175, 55, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(214, 175, 55, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(214, 175, 55, 0); }
         }
 
         /* 簡約文字懸浮回首頁按鈕 */
@@ -210,9 +248,10 @@
 </div>
 
 <script>
-    // 在此直接獨立出 verse 欄位，並將 title 後方的括號章節清除
+    // 1. 已新增對應的 id 屬性 (jonah1 ~ jonah4)
     const sermons = [
         {
+            id: "jonah1",
             chapter: "SERIES 01",
             title: "1. 三十六計，走為下策",
             verse: "📖拿一",
@@ -220,6 +259,7 @@
             url: "https://ia801808.us.archive.org/17/items/clcseniors-221012/CLCSeniors221012%20.mp3"
         },
         {
+            id: "jonah2",
             chapter: "SERIES 02",
             title: "2. 跑的了先知，躲不了神",
             verse: "📖拿二",
@@ -227,6 +267,7 @@
             url: "https://dn710106.ca.archive.org/0/items/clcseniors-221109/CLCSeniors221109.mp3"
         },
         {
+            id: "jonah3",
             chapter: "SERIES 03",
             title: "3. 呼召不改，本性要移",
             verse: "📖拿三",
@@ -234,6 +275,7 @@
             url: "https://dn711100.ca.archive.org/0/items/clcseniors-230628/CLCSeniors230628.mp3"
         },
         {
+            id: "jonah4",
             chapter: "SERIES 04",
             title: "4. 坐山觀審判，唯有神慈愛",
             verse: "📖拿四",
@@ -246,22 +288,76 @@
         const container = document.getElementById('sermon-container');
         if (!container) return;
         
-        container.innerHTML = sermons.map((s, index) => `
-            <div class="sermon-card" style="transition-delay: ${index * 0.1}s">
-                <span class="chapter-num">${s.chapter}</span>
-                <h2 class="sermon-title">${s.title}</h2>
-                <span class="bible-verse">${s.verse}</span>
-                <p class="description">${s.desc}</p>
-                <a href="${s.url}" class="play-button" target="_blank">Listen Now</a>
-            </div>
-        `).join('');
+        container.innerHTML = sermons.map((s, index) => {
+            // 2. 透過內建解碼與清除前後空格，精準識別含編碼或空格的 .mp3 結尾
+            const cleanUrl = decodeURIComponent(s.url).trim();
+            const isAudio = cleanUrl.toLowerCase().endsWith('.mp3');
+            
+            const actionElement = isAudio 
+                ? `<div class="audio-player-container" id="player-zone-${s.id}">
+                    <audio id="audio-${s.id}" controls preload="auto">
+                        <source src="${s.url}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                   </div>`
+                : `<a href="${s.url}" class="play-button" target="_blank">Listen Now</a>`;
+
+            return `
+                <div class="sermon-card" id="${s.id}" style="transition-delay: ${index * 0.1}s">
+                    <span class="chapter-num">${s.chapter}</span>
+                    <h2 class="sermon-title">${s.title}</h2>
+                    <span class="bible-verse">${s.verse}</span>
+                    <p class="description">${s.desc}</p>
+                    ${actionElement}
+                </div>
+            `;
+        }).join('');
 
         setTimeout(() => {
             document.querySelectorAll('.sermon-card').forEach(card => card.classList.add('visible'));
+            handleAutoplayFromHash();
         }, 100);
     }
 
+    // 3. 網址 Hash 自動播放引導與平滑滾動機制
+    function handleAutoplayFromHash() {
+        const hash = window.location.hash;
+        if (hash) {
+            const targetId = hash.replace('#', '');
+            const audioElement = document.getElementById(`audio-${targetId}`);
+            const cardElement = document.getElementById(targetId);
+            const playerZone = document.getElementById(`player-zone-${targetId}`);
+            
+            if (cardElement) {
+                cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                if (audioElement) {
+                    const oldBtn = document.getElementById(`hint-btn-${targetId}`);
+                    if (oldBtn) oldBtn.remove();
+
+                    audioElement.play().catch(error => {
+                        console.log("自動播放被瀏覽器政策攔截，生成引導按鈕。");
+                        
+                        // 建立符合海洋藍與金邊主題色系且顯示 "▶ LISTEN NOW" 的呼吸燈提示按鈕
+                        const hintBtn = document.createElement('button');
+                        hintBtn.id = `hint-btn-${targetId}`;
+                        hintBtn.className = 'play-button autoplay-hint-btn';
+                        hintBtn.innerHTML = '▶ LISTEN NOW';
+                        
+                        hintBtn.onclick = function() {
+                            audioElement.play();
+                            hintBtn.style.display = 'none';
+                        };
+                        
+                        playerZone.insertBefore(hintBtn, audioElement);
+                    });
+                }
+            }
+        }
+    }
+
     window.onload = renderSermons;
+    window.onhashchange = handleAutoplayFromHash;
 </script>
 
 </body>
