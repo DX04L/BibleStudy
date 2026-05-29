@@ -315,7 +315,8 @@
         if (!container) return;
 
         container.innerHTML = sermons.map((s, index) => {
-            const isAudio = s.url.endsWith('.mp3');
+            const cleanUrl = decodeURIComponent(s.url).trim();
+            const isAudio = cleanUrl.toLowerCase().endsWith('.mp3');
             
             const actionElement = isAudio 
                 ? `<div class="audio-player-container" id="player-zone-${s.id}">
@@ -339,8 +340,24 @@
 
         setTimeout(() => {
             document.querySelectorAll('.sermon-card').forEach(card => card.classList.add('visible'));
+            setupAudioMutex(); // 初始化單一播放監聽邏輯
             handleAutoplayFromHash();
         }, 100);
+    }
+
+    // 新增：設定多個播放器彼此互斥的監聽事件
+    function setupAudioMutex() {
+        const audios = document.querySelectorAll('audio');
+        audios.forEach(audio => {
+            audio.addEventListener('play', function() {
+                // 當前音訊開始播放時，暫停頁面上其他所有音訊播放器
+                audios.forEach(otherAudio => {
+                    if (otherAudio !== audio) {
+                        otherAudio.pause();
+                    }
+                });
+            });
+        });
     }
 
     function handleAutoplayFromHash() {
