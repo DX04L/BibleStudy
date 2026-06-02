@@ -15,7 +15,7 @@
 
         html { 
             scroll-behavior: smooth; 
-            height: 100%; /* Ensure html is full height */
+            height: 100%; 
         }
 
         body {
@@ -23,23 +23,22 @@
             margin: 0;
             padding: 0;
             color: var(--text-main);
-            background-color: #1a1a1a; /* Dark base color */
+            background-color: #1a1a1a; 
             background-image: url('John-Believe_bg.jpg'); 
             background-repeat: no-repeat;
             background-position: center center;
             background-attachment: fixed;
             background-size: cover;
             line-height: 1.6;
-            min-height: 100%; /* Ensure body can grow */
+            min-height: 100%; 
         }
 
         .overlay {
             background: rgba(0, 0, 0, 0.4); 
-            /* FIX: Use min-height 100vh but allow it to grow with content */
             min-height: 100vh;
             width: 100%;
             padding: 60px 20px;
-            box-sizing: border-box; /* Ensures padding doesn't add to width */
+            box-sizing: border-box; 
             display: flex;
             flex-direction: column;
         }
@@ -73,7 +72,7 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
-            width: 100%; /* Ensure container takes full width of parent */
+            width: 100%; 
         }
 
         .sermon-card {
@@ -94,7 +93,6 @@
             transform: translateY(0);
         }
 
-        /* 讓被指定的講道卡片有微微的發光提示效果 */
         .sermon-card:target {
             box-shadow: 0 0 25px rgba(212, 175, 55, 0.8);
             border-left-color: #ffffff;
@@ -114,12 +112,11 @@
 
         .sermon-title {
             font-size: 1.6rem;
-            margin: 0 0 4px 0; /* 縮小底部間距，讓經文靠近標題 */
+            margin: 0 0 4px 0; 
             color: var(--john-dark);
             font-weight: 700;
         }
 
-        /* 新增：經文的專屬樣式 */
         .bible-verse {
             font-size: 1.2rem;
             color: #555;
@@ -136,7 +133,6 @@
             padding-bottom: 15px;
         }
 
-        /* 新增：內嵌音訊播放器樣式 */
         .audio-player-container {
             margin-top: 15px;
             width: 100%;
@@ -174,7 +170,6 @@
             transform: translateY(-2px);
         }
 
-        /* 修改：被瀏覽器擋住自動播放時顯示的提示按鈕（修正為原色系黑金搭配） */
         .autoplay-hint-btn {
             background-color: var(--john-dark);
             color: var(--john-gold);
@@ -225,7 +220,7 @@
             text-align: center;
             color: #ffffff;
             padding: 60px 20px;
-            margin-top: auto; /* Pushes footer to bottom if content is short */
+            margin-top: auto; 
             font-family: 'Arial', sans-serif;
             font-size: 0.85rem;
             letter-spacing: 2px;
@@ -318,10 +313,10 @@
             const cleanUrl = decodeURIComponent(s.url).trim();
             const isAudio = cleanUrl.toLowerCase().endsWith('.mp3');
             
+            // FIX: Moved the 'src' attribute directly to the audio element and changed preload to 'metadata'
             const actionElement = isAudio 
                 ? `<div class="audio-player-container" id="player-zone-${s.id}">
-                    <audio id="audio-${s.id}" controls preload="auto">
-                        <source src="${s.url}" type="audio/mpeg">
+                    <audio id="audio-${s.id}" src="${s.url}" controls preload="metadata">
                         Your browser does not support the audio element.
                     </audio>
                    </div>`
@@ -340,17 +335,15 @@
 
         setTimeout(() => {
             document.querySelectorAll('.sermon-card').forEach(card => card.classList.add('visible'));
-            setupAudioMutex(); // 初始化單一播放監聽邏輯
+            setupAudioMutex(); 
             handleAutoplayFromHash();
         }, 100);
     }
 
-    // 新增：設定多個播放器彼此互斥的監聽事件
     function setupAudioMutex() {
         const audios = document.querySelectorAll('audio');
         audios.forEach(audio => {
             audio.addEventListener('play', function() {
-                // 當前音訊開始播放時，暫停頁面上其他所有音訊播放器
                 audios.forEach(otherAudio => {
                     if (otherAudio !== audio) {
                         otherAudio.pause();
@@ -378,7 +371,6 @@
                     audioElement.play().catch(error => {
                         console.log("自動播放被瀏覽器政策攔截，生成引導按鈕。");
                         
-                        // 建立修改為原主題色系且顯示 "▶ LISTEN NOW" 的引導按鈕
                         const hintBtn = document.createElement('button');
                         hintBtn.id = `hint-btn-${targetId}`;
                         hintBtn.className = 'play-button autoplay-hint-btn';
@@ -386,7 +378,7 @@
                         
                         hintBtn.onclick = function() {
                             audioElement.play();
-                            hintBtn.style.display = 'none';
+                            hintBtn.remove(); // FIX: Completely clean up the element from the DOM instead of hiding it
                         };
                         
                         playerZone.insertBefore(hintBtn, audioElement);
