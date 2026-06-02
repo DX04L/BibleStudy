@@ -16,7 +16,6 @@
         html { scroll-behavior: smooth; }
 
         body {
-            /* 字體更新為 Arial */
             font-family: 'Arial', 'Helvetica', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
             margin: 0;
             padding: 0;
@@ -86,7 +85,6 @@
             transform: translateY(0);
         }
 
-        /* 讓被指定的講道卡片有微微的發光提示效果 */
         .sermon-card:target {
             box-shadow: 0 0 25px rgba(214, 175, 55, 0.8);
             border-left-color: #ffffff;
@@ -106,12 +104,11 @@
 
         .sermon-title {
             font-size: 1.5rem;
-            margin: 0 0 4px 0; /* 縮小底部間距，讓經文靠近標題 */
+            margin: 0 0 4px 0; 
             color: #111;
             font-weight: 700;
         }
 
-        /* 新增：經文的專屬樣式 */
         .bible-verse {
             font-size: 1.15rem;
             color: #555;
@@ -126,15 +123,63 @@
             margin-bottom: 25px;
         }
 
-        /* 新增：內嵌音訊播放器樣式 */
         .audio-player-container {
             margin-top: 15px;
             width: 100%;
+        }
+
+        /* NEW: Audio Wrapper & Theme Matching Custom Loading Indicator styles */
+        .audio-wrapper {
+            position: relative;
+            width: 100%;
+            transition: all 0.3s ease;
         }
         
         audio {
             width: 100%;
             outline: none;
+            display: block;
+        }
+
+        .audio-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 58, 74, 0.5); /* Semi-transparent matching ocean blue theme */
+            backdrop-filter: blur(1px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none; 
+            transition: opacity 0.2s ease;
+            z-index: 5;
+            border-radius: 4px;
+        }
+
+        /* Active loading and buffering states */
+        .audio-wrapper.is-loading .audio-loader {
+            opacity: 1;
+        }
+
+        .audio-wrapper.is-loading {
+            box-shadow: 0 0 12px rgba(214, 175, 55, 0.5);
+        }
+
+        .spinner-circle {
+            width: 26px;
+            height: 26px;
+            border: 3px solid rgba(214, 175, 55, 0.2);
+            border-top: 3px solid var(--gold-accent);
+            border-radius: 50%;
+            animation: audio-spin 0.8s linear infinite;
+        }
+
+        @keyframes audio-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .play-button {
@@ -163,7 +208,6 @@
             transform: scale(1.02);
         }
 
-        /* 新增：被瀏覽器擋住自動播放時顯示的提示按鈕（維持原色系海洋藍與金邊） */
         .autoplay-hint-btn {
             background-color: var(--ocean-blue);
             color: var(--gold-accent);
@@ -181,7 +225,6 @@
             100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(214, 175, 55, 0); }
         }
 
-        /* 簡約文字懸浮回首頁按鈕 */
         .home-btn {
             position: fixed;
             bottom: 30px;
@@ -248,7 +291,6 @@
 </div>
 
 <script>
-    // 1. 已新增對應的 id 屬性 (jonah1 ~ jonah4)
     const sermons = [
         {
             id: "jonah1",
@@ -289,16 +331,20 @@
         if (!container) return;
         
         container.innerHTML = sermons.map((s, index) => {
-            // 2. 透過內建解碼與清除前後空格，精準識別含編碼或空格的 .mp3 結尾
             const cleanUrl = decodeURIComponent(s.url).trim();
             const isAudio = cleanUrl.toLowerCase().endsWith('.mp3');
             
+            // CHANGES APPLIED: Bound src directly to audio tag, altered preload parameters, added nesting wrapper structure
             const actionElement = isAudio 
                 ? `<div class="audio-player-container" id="player-zone-${s.id}">
-                    <audio id="audio-${s.id}" controls preload="auto">
-                        <source src="${s.url}" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
+                    <div class="audio-wrapper">
+                        <audio id="audio-${s.id}" src="${s.url}" controls preload="metadata">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <div class="audio-loader">
+                            <div class="spinner-circle"></div>
+                        </div>
+                    </div>
                    </div>`
                 : `<a href="${s.url}" class="play-button" target="_blank">Listen Now</a>`;
 
@@ -315,27 +361,60 @@
 
         setTimeout(() => {
             document.querySelectorAll('.sermon-card').forEach(card => card.classList.add('visible'));
-            setupAudioMutex(); // 初始化單一播放監聽邏輯
+            setupAudioEngine(); 
             handleAutoplayFromHash();
         }, 100);
     }
 
-    // 新增：設定多個播放器彼此互斥的監聽事件
-    function setupAudioMutex() {
+    // CHANGES APPLIED: Replaced setupAudioMutex with integrated state listener network to catch Android pipeline stalling
+    function setupAudioEngine() {
         const audios = document.querySelectorAll('audio');
+        
         audios.forEach(audio => {
+            const wrapper = audio.closest('.audio-wrapper');
+            if (!wrapper) return;
+
+            const showLoader = () => wrapper.classList.add('is-loading');
+            const hideLoader = () => wrapper.classList.remove('is-loading');
+
+            // Mutex management & Android Engine Core recovery hook
             audio.addEventListener('play', function() {
-                // 當前音訊開始播放時，暫停頁面上其他所有音訊播放器
                 audios.forEach(otherAudio => {
                     if (otherAudio !== audio) {
                         otherAudio.pause();
                     }
                 });
+
+                if (audio.dataset.androidFixing === "true") return;
+
+                if (audio.readyState <= 1) {
+                    audio.dataset.androidFixing = "true";
+                    const currentPos = audio.currentTime;
+                    showLoader();
+                    
+                    audio.load(); 
+                    audio.currentTime = currentPos; 
+                    
+                    audio.play()
+                        .then(() => { audio.dataset.androidFixing = "false"; })
+                        .catch(() => { audio.dataset.androidFixing = "false"; });
+                }
             });
+
+            // Media event mapping for turning buffering overlay indicator ON
+            audio.addEventListener('seeking', showLoader);
+            audio.addEventListener('waiting', showLoader);
+            audio.addEventListener('stalled', showLoader);
+            audio.addEventListener('loadstart', showLoader);
+
+            // Media event mapping for turning buffering overlay indicator OFF
+            audio.addEventListener('playing', hideLoader);
+            audio.addEventListener('canplay', hideLoader);
+            audio.addEventListener('pause', hideLoader);
+            audio.addEventListener('seeked', hideLoader);
         });
     }
 
-    // 3. 網址 Hash 自動播放引導與平滑滾動機制
     function handleAutoplayFromHash() {
         const hash = window.location.hash;
         if (hash) {
@@ -354,7 +433,6 @@
                     audioElement.play().catch(error => {
                         console.log("自動播放被瀏覽器政策攔截，生成引導按鈕。");
                         
-                        // 建立符合海洋藍與金邊主題色系且顯示 "▶ LISTEN NOW" 的呼吸燈提示按鈕
                         const hintBtn = document.createElement('button');
                         hintBtn.id = `hint-btn-${targetId}`;
                         hintBtn.className = 'play-button autoplay-hint-btn';
@@ -362,10 +440,10 @@
                         
                         hintBtn.onclick = function() {
                             audioElement.play();
-                            hintBtn.style.display = 'none';
+                            hintBtn.remove(); // CHANGES APPLIED: Replaced display hiding with absolute element destruction
                         };
                         
-                        playerZone.insertBefore(hintBtn, audioElement);
+                        playerZone.insertBefore(hintBtn, playerZone.firstChild);
                     });
                 }
             }
