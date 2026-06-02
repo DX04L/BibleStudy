@@ -7,7 +7,6 @@
     
     <style>
         :root {
-            /* 恢復原本以斯帖記的色調 */
             --esther-gold: #d4af37;
             --esther-pink: #f8c2d1;
             --esther-dark-pink: #e91e63;
@@ -19,7 +18,6 @@
         html { scroll-behavior: smooth; }
 
         body {
-            /* 英文字體更新為 Arial */
             font-family: 'Arial', 'Helvetica', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
             margin: 0;
             padding: 0;
@@ -37,6 +35,9 @@
             background: rgba(255, 255, 255, 0.2); 
             min-height: 100vh;
             padding: 40px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
 
         .header {
@@ -67,11 +68,13 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
+            width: 100%;
         }
 
         .sermon-card {
             background: var(--glass-bg);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px;
             margin-bottom: 30px;
@@ -87,6 +90,13 @@
             transform: translateY(0);
         }
 
+        /* 網址錨點選中時的發光提示效果 */
+        .sermon-card:target {
+            box-shadow: 0 0 25px rgba(233, 30, 99, 0.5);
+            border-left-color: var(--esther-dark-pink);
+            background: #ffffff;
+        }
+
         .chapter-num {
             font-family: 'Arial', sans-serif;
             color: var(--esther-dark-pink);
@@ -100,12 +110,11 @@
 
         .sermon-title {
             font-size: 1.6rem;
-            margin: 0 0 4px 0; /* 縮小底部間距，讓經文靠近標題 */
+            margin: 0 0 4px 0; 
             color: var(--esther-navy);
             font-weight: 700;
         }
 
-        /* 新增：經文的專屬樣式 */
         .bible-verse {
             font-size: 1.15rem;
             color: #555;
@@ -122,16 +131,85 @@
             padding-bottom: 15px;
         }
 
-        .button-group {
+        .audio-player-container {
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        /* 新增：支援多音軌卡片的內部排版樣式 */
+        .audio-track-item {
+            margin-bottom: 14px;
+            width: 100%;
+        }
+        .audio-track-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .part-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--esther-navy);
+            display: block;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        /* 新增：音訊播放器包覆外殼與自訂主題色載入特效 */
+        .audio-wrapper {
+            position: relative;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        audio {
+            width: 100%;
+            outline: none;
+            display: block;
+        }
+
+        .audio-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 35, 126, 0.4); /* 半透明皇家藍外殼 */
+            backdrop-filter: blur(1px);
             display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none; 
+            transition: opacity 0.2s ease;
+            z-index: 5;
+            border-radius: 12px;
+        }
+
+        /* 當載入/緩衝進行時的動態啟動類別 */
+        .audio-wrapper.is-loading .audio-loader {
+            opacity: 1;
+        }
+
+        .audio-wrapper.is-loading {
+            box-shadow: 0 0 12px rgba(233, 30, 99, 0.4);
+        }
+
+        .spinner-circle {
+            width: 26px;
+            height: 26px;
+            border: 3px solid rgba(254, 194, 209, 0.3);
+            border-top: 3px solid var(--esther-gold);
+            border-radius: 50%;
+            animation: audio-spin 0.8s linear infinite;
+        }
+
+        @keyframes audio-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .play-button {
             font-family: 'Arial', sans-serif;
-            flex: 1;
-            min-width: 140px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -144,6 +222,10 @@
             font-size: 1rem;
             transition: 0.3s;
             text-transform: uppercase;
+            width: 100%;
+            box-sizing: border-box;
+            cursor: pointer;
+            border: 1px solid transparent;
         }
 
         .play-button:hover {
@@ -151,7 +233,25 @@
             transform: scale(1.03);
         }
 
-        /* 簡約文字懸浮回首頁按鈕 */
+        .autoplay-hint-btn {
+            background-color: var(--esther-navy);
+            color: var(--esther-gold);
+            border: 1px solid var(--esther-gold);
+            margin-bottom: 15px;
+            animation: pulse 1.5s infinite;
+        }
+        .autoplay-hint-btn:hover {
+            background-color: var(--esther-dark-pink);
+            color: white;
+            border-color: transparent;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(214, 175, 55, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(214, 175, 55, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(214, 175, 55, 0); }
+        }
+
         .home-btn {
             position: fixed;
             bottom: 30px;
@@ -184,6 +284,7 @@
             text-align: center;
             color: #666;
             padding: 60px 20px;
+            margin-top: auto;
             font-family: 'Arial', sans-serif;
             font-size: 0.85rem;
             letter-spacing: 1px;
@@ -218,19 +319,21 @@
 </div>
 
 <script>
-    // 在此直接獨立出 verse 欄位，並將 title 後方的方括號經文清除
+    // 已全面補上個別對應的 id (esther1 ~ esther7)
     const sermons = [
         {
+            id: "esther1",
             chapter: "SERIES 01",
             title: "1. 聽天不由命",
             verse: "📖以斯帖記介紹",
             desc: "聽天不由命｜神你在哪裡？",
             links: [
-                { label: "PART A", url: "https://tinyurl.com/CLCSeniors-Sermon250227" },
-                { label: "PART B", url: "https://tinyurl.com/CLCSeniors-Sermon250327" }
+                { label: "PART A", url: "https://dn711509.ca.archive.org/0/items/clcseniors-250227/CLCSeniors250227.mp3" },
+                { label: "PART B", url: "https://dn721803.ca.archive.org/0/items/clcseniors-250327/CLCSeniors250327.mp3" }
             ]
         },
         {
+            id: "esther2",
             chapter: "SERIES 02",
             title: "2. 兩個荒宴",
             verse: "📖斯1~2章",
@@ -240,6 +343,7 @@
             ]
         },
         {
+            id: "esther3",
             chapter: "SERIES 03",
             title: "3. 黑色陰謀",
             verse: "📖斯3~4章",
@@ -249,6 +353,7 @@
             ]
         },
         {
+            id: "esther4",
             chapter: "SERIES 04",
             title: "4. 雙宴密謀",
             verse: "📖斯5~7章",
@@ -258,6 +363,7 @@
             ]
         },
         {
+            id: "esther5",
             chapter: "SERIES 05",
             title: "5. 扭轉乾坤",
             verse: "📖斯8章",
@@ -267,6 +373,7 @@
             ]
         },
         {
+            id: "esther6",
             chapter: "SERIES 06",
             title: "6. 兩個華宴",
             verse: "📖斯9~10章",
@@ -277,6 +384,7 @@
             ]
         },
         {
+            id: "esther7",
             chapter: "SERIES 07",
             title: "7. 我為此而生",
             verse: "📖以斯帖記總結",
@@ -289,26 +397,138 @@
 
     function renderSermons() {
         const container = document.getElementById('sermon-container');
-        container.innerHTML = sermons.map((s, index) => `
-            <div class="sermon-card" style="transition-delay: ${index * 0.1}s">
-                <span class="chapter-num">${s.chapter}</span>
-                <h2 class="sermon-title">${s.title}</h2>
-                <span class="bible-verse">${s.verse}</span>
-                <p class="description">${s.desc}</p>
-                <div class="button-group">
-                    ${s.links.map(link => `
-                        <a href="${link.url}" class="play-button" target="_blank">${link.label}</a>
-                    `).join('')}
+        if (!container) return;
+
+        container.innerHTML = sermons.map((s, index) => {
+            // 自動為複數連結卡片或單一連結卡片生成對應的 HTML5 內嵌播放器模組
+            const actionElement = `
+                <div class="audio-player-container" id="player-zone-${s.id}">
+                    ${s.links.map((link, idx) => {
+                        const isMulti = s.links.length > 1;
+                        const partLabelMarkup = isMulti ? `<span class="part-label">${link.label}</span>` : '';
+                        return `
+                            <div class="audio-track-item">
+                                ${partLabelMarkup}
+                                <div class="audio-wrapper">
+                                    <audio id="audio-${s.id}-${idx}" src="${link.url}" controls preload="metadata">
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                    <div class="audio-loader">
+                                        <div class="spinner-circle"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>`;
+
+            return `
+                <div class="sermon-card" id="${s.id}" style="transition-delay: ${index * 0.1}s">
+                    <span class="chapter-num">${s.chapter}</span>
+                    <h2 class="sermon-title">${s.title}</h2>
+                    <span class="bible-verse">${s.verse}</span>
+                    <p class="description">${s.desc}</p>
+                    ${actionElement}
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         setTimeout(() => {
             document.querySelectorAll('.sermon-card').forEach(card => card.classList.add('visible'));
+            setupAudioEngine(); 
+            handleAutoplayFromHash();
         }, 100);
     }
 
+    // 核心音訊核心監聽器網絡（整合單一播放、Android 防卡死、緩衝圈狀態切換）
+    function setupAudioEngine() {
+        const audios = document.querySelectorAll('audio');
+        
+        audios.forEach(audio => {
+            const wrapper = audio.closest('.audio-wrapper');
+            if (!wrapper) return;
+
+            const showLoader = () => wrapper.classList.add('is-loading');
+            const hideLoader = () => wrapper.classList.remove('is-loading');
+
+            // 1. 互斥播放控制 + Android 手機專屬快取修復機制
+            audio.addEventListener('play', function() {
+                audios.forEach(otherAudio => {
+                    if (otherAudio !== audio) {
+                        otherAudio.pause();
+                    }
+                });
+
+                if (audio.dataset.androidFixing === "true") return;
+
+                // 若核心被檢測出因暫停拖拽而斷開連接 (readyState 狀態為 0 或 1)
+                if (audio.readyState <= 1) {
+                    audio.dataset.androidFixing = "true";
+                    const currentPos = audio.currentTime;
+                    showLoader();
+                    
+                    audio.load(); 
+                    audio.currentTime = currentPos; 
+                    
+                    audio.play()
+                        .then(() => { audio.dataset.androidFixing = "false"; })
+                        .catch(() => { audio.dataset.androidFixing = "false"; });
+                }
+            });
+
+            // 2. 開啟緩衝特效監聽
+            audio.addEventListener('seeking', showLoader);
+            audio.addEventListener('waiting', showLoader);
+            audio.addEventListener('stalled', showLoader);
+            audio.addEventListener('loadstart', showLoader);
+
+            // 3. 關閉緩衝特效監聽
+            audio.addEventListener('playing', hideLoader);
+            audio.addEventListener('canplay', hideLoader);
+            audio.addEventListener('pause', hideLoader);
+            audio.addEventListener('seeked', hideLoader);
+        });
+    }
+
+    // 雜湊自動定位與自動播放遭攔截引導處理
+    function handleAutoplayFromHash() {
+        const hash = window.location.hash;
+        if (hash) {
+            const targetId = hash.replace('#', '');
+            // 優先尋找卡片的第一個音軌作爲自動播放對象
+            const audioElement = document.getElementById(`audio-${targetId}-0`) || document.getElementById(`audio-${targetId}`);
+            const cardElement = document.getElementById(targetId);
+            const playerZone = document.getElementById(`player-zone-${targetId}`);
+            
+            if (cardElement) {
+                cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                if (audioElement) {
+                    const oldBtn = document.getElementById(`hint-btn-${targetId}`);
+                    if (oldBtn) oldBtn.remove();
+
+                    audioElement.play().catch(error => {
+                        console.log("自動播放被瀏覽器政策攔截，生成引導按鈕。");
+                        
+                        const hintBtn = document.createElement('button');
+                        hintBtn.id = `hint-btn-${targetId}`;
+                        hintBtn.className = 'play-button autoplay-hint-btn';
+                        hintBtn.innerHTML = '▶ LISTEN NOW';
+                        
+                        hintBtn.onclick = function() {
+                            audioElement.play();
+                            hintBtn.remove(); // 徹底清除按鈕元素
+                        };
+                        
+                        playerZone.insertBefore(hintBtn, playerZone.firstChild);
+                    });
+                }
+            }
+        }
+    }
+
     window.onload = renderSermons;
+    window.onhashchange = handleAutoplayFromHash;
 </script>
 
 </body>
