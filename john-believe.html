@@ -313,7 +313,6 @@
             const cleanUrl = decodeURIComponent(s.url).trim();
             const isAudio = cleanUrl.toLowerCase().endsWith('.mp3');
             
-            // FIX: Moved the 'src' attribute directly to the audio element and changed preload to 'metadata'
             const actionElement = isAudio 
                 ? `<div class="audio-player-container" id="player-zone-${s.id}">
                     <audio id="audio-${s.id}" src="${s.url}" controls preload="metadata">
@@ -340,15 +339,33 @@
         }, 100);
     }
 
+    // FIX: Enhanced with an Android Stalling Workaround logic
     function setupAudioMutex() {
         const audios = document.querySelectorAll('audio');
         audios.forEach(audio => {
             audio.addEventListener('play', function() {
+                // 1. Mutex: Pause other players
                 audios.forEach(otherAudio => {
                     if (otherAudio !== audio) {
                         otherAudio.pause();
                     }
                 });
+
+                // 2. Android Engine Rescue: Prevent infinite looping flag
+                if (audio.dataset.androidFixing === "true") return;
+
+                // If Android Chrome broke the stream during a paused drag (readyState drops to 0 or 1)
+                if (audio.readyState <= 1) {
+                    audio.dataset.androidFixing = "true";
+                    const currentPos = audio.currentTime;
+                    
+                    audio.load(); // Hard reset the stream pipelines
+                    audio.currentTime = currentPos; // Re-sync timeline target
+                    
+                    audio.play()
+                        .then(() => { audio.dataset.androidFixing = "false"; })
+                        .catch(() => { audio.dataset.androidFixing = "false"; });
+                }
             });
         });
     }
@@ -378,7 +395,7 @@
                         
                         hintBtn.onclick = function() {
                             audioElement.play();
-                            hintBtn.remove(); // FIX: Completely clean up the element from the DOM instead of hiding it
+                            hintBtn.remove(); 
                         };
                         
                         playerZone.insertBefore(hintBtn, audioElement);
