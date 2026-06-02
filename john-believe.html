@@ -137,10 +137,59 @@
             margin-top: 15px;
             width: 100%;
         }
-        
+
+        /* NEW: Audio Wrapper & Custom Loading Indicator styles */
+        .audio-wrapper {
+            position: relative;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
         audio {
             width: 100%;
             outline: none;
+            display: block;
+        }
+
+        .audio-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 26, 0.5); /* Semi-transparent matching dark theme */
+            backdrop-filter: blur(1px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none; /* Allows users to still tap through it if needed */
+            transition: opacity 0.2s ease;
+            z-index: 5;
+            border-radius: 4px;
+        }
+
+        /* Active buffering state */
+        .audio-wrapper.is-loading .audio-loader {
+            opacity: 1;
+        }
+
+        .audio-wrapper.is-loading {
+            box-shadow: 0 0 12px rgba(214, 175, 55, 0.5);
+        }
+
+        .spinner-circle {
+            width: 26px;
+            height: 26px;
+            border: 3px solid rgba(214, 175, 55, 0.2);
+            border-top: 3px solid var(--john-gold);
+            border-radius: 50%;
+            animation: audio-spin 0.8s linear infinite;
+        }
+
+        @keyframes audio-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .play-button {
@@ -313,11 +362,17 @@
             const cleanUrl = decodeURIComponent(s.url).trim();
             const isAudio = cleanUrl.toLowerCase().endsWith('.mp3');
             
+            // MODIFIED: Wrapped native audio component inside an structural wrapper containing a visual loader element
             const actionElement = isAudio 
                 ? `<div class="audio-player-container" id="player-zone-${s.id}">
-                    <audio id="audio-${s.id}" src="${s.url}" controls preload="metadata">
-                        Your browser does not support the audio element.
-                    </audio>
+                    <div class="audio-wrapper">
+                        <audio id="audio-${s.id}" src="${s.url}" controls preload="metadata">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <div class="audio-loader">
+                            <div class="spinner-circle"></div>
+                        </div>
+                    </div>
                    </div>`
                 : `<a href="${s.url}" class="play-button" target="_blank">Listen Now</a>`;
 
@@ -334,39 +389,57 @@
 
         setTimeout(() => {
             document.querySelectorAll('.sermon-card').forEach(card => card.classList.add('visible'));
-            setupAudioMutex(); 
+            setupAudioEngine(); 
             handleAutoplayFromHash();
         }, 100);
     }
 
-    // FIX: Enhanced with an Android Stalling Workaround logic
-    function setupAudioMutex() {
+    // MODIFIED: Combined Mutex, Android engine rescue, and UI loader events cleanly
+    function setupAudioEngine() {
         const audios = document.querySelectorAll('audio');
+        
         audios.forEach(audio => {
+            const wrapper = audio.closest('.audio-wrapper');
+            if (!wrapper) return;
+
+            const showLoader = () => wrapper.classList.add('is-loading');
+            const hideLoader = () => wrapper.classList.remove('is-loading');
+
+            // 1. Core playback state managers & Android Rescue hooks
             audio.addEventListener('play', function() {
-                // 1. Mutex: Pause other players
                 audios.forEach(otherAudio => {
                     if (otherAudio !== audio) {
                         otherAudio.pause();
                     }
                 });
 
-                // 2. Android Engine Rescue: Prevent infinite looping flag
                 if (audio.dataset.androidFixing === "true") return;
 
-                // If Android Chrome broke the stream during a paused drag (readyState drops to 0 or 1)
                 if (audio.readyState <= 1) {
                     audio.dataset.androidFixing = "true";
                     const currentPos = audio.currentTime;
+                    showLoader();
                     
-                    audio.load(); // Hard reset the stream pipelines
-                    audio.currentTime = currentPos; // Re-sync timeline target
+                    audio.load(); 
+                    audio.currentTime = currentPos; 
                     
                     audio.play()
                         .then(() => { audio.dataset.androidFixing = "false"; })
                         .catch(() => { audio.dataset.androidFixing = "false"; });
                 }
             });
+
+            // 2. Event listeners for turning ON the loading indicator
+            audio.addEventListener('seeking', showLoader);
+            audio.addEventListener('waiting', showLoader);
+            audio.addEventListener('stalled', showLoader);
+            audio.addEventListener('loadstart', showLoader);
+
+            // 3. Event listeners for turning OFF the loading indicator
+            audio.addEventListener('playing', hideLoader);
+            audio.addEventListener('canplay', hideLoader);
+            audio.addEventListener('pause', hideLoader);
+            audio.addEventListener('seeked', hideLoader);
         });
     }
 
@@ -398,7 +471,7 @@
                             hintBtn.remove(); 
                         };
                         
-                        playerZone.insertBefore(hintBtn, audioElement);
+                        playerZone.insertBefore(hintBtn, playerZone.firstChild);
                     });
                 }
             }
