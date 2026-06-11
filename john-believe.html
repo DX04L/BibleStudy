@@ -138,7 +138,7 @@
             width: 100%;
         }
 
-        /* 新增：支援多音軌卡片的內部排版樣式 */
+        /* 支援多音軌卡片的內部排版樣式 */
         .audio-track-item {
             margin-bottom: 14px;
             width: 100%;
@@ -321,7 +321,7 @@
 </div>
 
 <script>
-    // 已全面改為與以斯帖記一致的 links 複數架構
+    // 全面升級為與包含獨立 id 的 track 級架構
     const sermons = [
         {
             id: "intro",
@@ -330,7 +330,7 @@
             verse: "📖約20:31",
             desc: "明白約翰福音的核心目的：叫你們信耶穌是基督，是神的兒子。",
             links: [
-                { label: "LISTEN NOW", url: "https://ia903107.us.archive.org/17/items/clcseniors-251127/CLCSeniors251127.mp3" }
+                { id: "intro-a", label: "LISTEN NOW", url: "https://ia903107.us.archive.org/17/items/clcseniors-251127/CLCSeniors251127.mp3" }
             ]
         },
         {
@@ -340,7 +340,7 @@
             verse: "📖約2:1-11",
             desc: "人能相信，不只因為看見神蹟，而是因為經歷神的榮耀！",
             links: [
-                { label: "LISTEN NOW", url: "https://ia903102.us.archive.org/2/items/clcseniors-260115/CLCSeniors260115.mp3" }
+                { id: "sign1-a", label: "LISTEN NOW", url: "https://ia903102.us.archive.org/2/items/clcseniors-260115/CLCSeniors260115.mp3" }
             ]
         },
         {
@@ -350,7 +350,7 @@
             verse: "📖約4:43-54",
             desc: "我們相信，是因為在信心的行動中認識了耶穌！",
             links: [
-                { label: "LISTEN NOW", url: "https://ia600804.us.archive.org/17/items/clcseniors-260326/CLCSeniors260326.mp3" }
+                { id: "sign2-a", label: "LISTEN NOW", url: "https://ia600804.us.archive.org/17/items/clcseniors-260326/CLCSeniors260326.mp3" }
             ]
         },
         {
@@ -360,7 +360,7 @@
             verse: "📖約5:1-18",
             desc: "信靠耶穌，不要相信傳說！走出絕望的循環，在如今還為你做事的基督裡安息。",
             links: [
-                { label: "LISTEN NOW", url: "https://ia600604.us.archive.org/16/items/clcseniors-260423/CLCSeniors260423.mp3" }
+                { id: "sign3-a", label: "LISTEN NOW", url: "https://ia600604.us.archive.org/16/items/clcseniors-260423/CLCSeniors260423.mp3" }
             ]
         },
         {
@@ -370,7 +370,7 @@
             verse: "📖約6:1-15",
             desc: "Believe，因為耶穌要使你的生命豐富有餘，更要救你脫離罪的轄制！",
             links: [
-                { label: "LISTEN NOW", url: "https://dn721501.ca.archive.org/0/items/clcseniors-260514/CLCSeniors260514.mp3" }
+                { id: "sign4-a", label: "LISTEN NOW", url: "https://dn721501.ca.archive.org/0/items/clcseniors-260514/CLCSeniors260514.mp3" }
             ]
         },
         {
@@ -380,8 +380,8 @@
             verse: "📖約6:25-59",
             desc: "耶穌就是生命的糧，唯有祂常在我們裡面才有真滿足。",
             links: [
-                { label: "PART A", url: "https://ia601505.us.archive.org/29/items/clcseniors-260528/CLCSeniors260528.mp3" },
-                { label: "PART B", url: "https://ia903104.us.archive.org/7/items/clcseniors-260611/CLCSeniors260611.mp3" }
+                { id: "iam1-a", label: "PART A", url: "https://ia601505.us.archive.org/29/items/clcseniors-260528/CLCSeniors260528.mp3" },
+                { id: "iam1-b", label: "PART B", url: "https://ia903104.us.archive.org/7/items/clcseniors-260611/CLCSeniors260611.mp3" }
             ]
         }
     ];
@@ -393,7 +393,7 @@
         container.innerHTML = sermons.map((s, index) => {
             const actionElement = `
                 <div class="audio-player-container" id="player-zone-${s.id}">
-                    ${s.links.map((link, idx) => {
+                    ${s.links.map((link) => {
                         const isMulti = s.links.length > 1;
                         const partLabelMarkup = isMulti ? `<span class="part-label">${link.label}</span>` : '';
                         
@@ -405,7 +405,7 @@
                             <div class="audio-track-item">
                                 ${partLabelMarkup}
                                 <div class="audio-wrapper">
-                                    <audio id="audio-${s.id}-${idx}" src="${link.url}" controls preload="metadata">
+                                    <audio id="audio-${link.id}" src="${link.url}" controls preload="metadata">
                                         Your browser does not support the audio element.
                                     </audio>
                                     <div class="audio-loader">
@@ -490,15 +490,27 @@
         const hash = window.location.hash;
         if (hash) {
             const targetId = hash.replace('#', '');
-            // 優先尋找卡片的第一個音軌（例如：audio-iam1-0）作爲自動播放對象
-            const audioElement = document.getElementById(`audio-${targetId}-0`) || document.getElementById(`audio-${targetId}`);
-            const cardElement = document.getElementById(targetId);
-            const playerZone = document.getElementById(`player-zone-${targetId}`);
+            
+            let cardElement = document.getElementById(targetId);
+            let audioElement = null;
+            
+            // 判斷錨點是直接指向字卡卡片還是特定音軌
+            if (cardElement && cardElement.classList.contains('sermon-card')) {
+                // 如果是指向卡片 (例如 #iam1)，預設抓卡片內的第一個播放器
+                audioElement = cardElement.querySelector('audio');
+            } else {
+                // 如果是指向音軌 (例如 #iam1-b)，直接抓取對應音訊元件
+                audioElement = document.getElementById(`audio-${targetId}`);
+                if (audioElement) {
+                    cardElement = audioElement.closest('.sermon-card');
+                }
+            }
             
             if (cardElement) {
                 cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 
                 if (audioElement) {
+                    const playerZone = cardElement.querySelector('.audio-player-container');
                     const oldBtn = document.getElementById(`hint-btn-${targetId}`);
                     if (oldBtn) oldBtn.remove();
 
@@ -508,14 +520,24 @@
                         const hintBtn = document.createElement('button');
                         hintBtn.id = `hint-btn-${targetId}`;
                         hintBtn.className = 'play-button autoplay-hint-btn';
-                        hintBtn.innerHTML = '▶ LISTEN NOW';
+                        
+                        // 根據傳入的 ID 動態決定提示按鈕上顯示的文字
+                        let labelText = targetId.toUpperCase();
+                        if (labelText.includes('IAM1-')) {
+                            labelText = labelText.replace('IAM1-', 'PART ');
+                        } else if (labelText === 'IAM1') {
+                            labelText = 'PART A';
+                        }
+                        hintBtn.innerHTML = `▶ PLAY ${labelText}`;
                         
                         hintBtn.onclick = function() {
                             audioElement.play();
                             hintBtn.remove(); 
                         };
                         
-                        playerZone.insertBefore(hintBtn, playerZone.firstChild);
+                        if (playerZone) {
+                            playerZone.insertBefore(hintBtn, playerZone.firstChild);
+                        }
                     });
                 }
             }
