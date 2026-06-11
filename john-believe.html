@@ -138,7 +138,25 @@
             width: 100%;
         }
 
-        /* NEW: Audio Wrapper & Custom Loading Indicator styles */
+        /* 新增：支援多音軌卡片的內部排版樣式 */
+        .audio-track-item {
+            margin-bottom: 14px;
+            width: 100%;
+        }
+        .audio-track-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .part-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--john-dark);
+            display: block;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        /* Audio Wrapper & Custom Loading Indicator styles */
         .audio-wrapper {
             position: relative;
             width: 100%;
@@ -163,7 +181,7 @@
             align-items: center;
             justify-content: center;
             opacity: 0;
-            pointer-events: none; /* Allows users to still tap through it if needed */
+            pointer-events: none; 
             transition: opacity 0.2s ease;
             z-index: 5;
             border-radius: 4px;
@@ -303,6 +321,7 @@
 </div>
 
 <script>
+    // 已全面改為與以斯帖記一致的 links 複數架構
     const sermons = [
         {
             id: "intro",
@@ -310,7 +329,9 @@
             title: "神蹟與真神 1｜介紹：使你能相信",
             verse: "📖約20:31",
             desc: "明白約翰福音的核心目的：叫你們信耶穌是基督，是神的兒子。",
-            url: "https://ia903107.us.archive.org/17/items/clcseniors-251127/CLCSeniors251127.mp3"
+            links: [
+                { label: "LISTEN NOW", url: "https://ia903107.us.archive.org/17/items/clcseniors-251127/CLCSeniors251127.mp3" }
+            ]
         },
         {
             id: "sign1",
@@ -318,7 +339,9 @@
             title: "神蹟與真神 2｜神蹟一：好酒人生",
             verse: "📖約2:1-11",
             desc: "人能相信，不只因為看見神蹟，而是因為經歷神的榮耀！",
-            url: "https://ia903102.us.archive.org/2/items/clcseniors-260115/CLCSeniors260115.mp3"
+            links: [
+                { label: "LISTEN NOW", url: "https://ia903102.us.archive.org/2/items/clcseniors-260115/CLCSeniors260115.mp3" }
+            ]
         },
         {
             id: "sign2",
@@ -326,7 +349,9 @@
             title: "神蹟與真神 3｜神蹟二：超越時空的信心",
             verse: "📖約4:43-54",
             desc: "我們相信，是因為在信心的行動中認識了耶穌！",
-            url: "https://ia600804.us.archive.org/17/items/clcseniors-260326/CLCSeniors260326.mp3"
+            links: [
+                { label: "LISTEN NOW", url: "https://ia600804.us.archive.org/17/items/clcseniors-260326/CLCSeniors260326.mp3" }
+            ]
         },
         {
             id: "sign3",
@@ -334,7 +359,9 @@
             title: "神蹟與真神 4｜神蹟三：走出絕望的循環",
             verse: "📖約5:1-18",
             desc: "信靠耶穌，不要相信傳說！走出絕望的循環，在如今還為你做事的基督裡安息。",
-            url: "https://ia600604.us.archive.org/16/items/clcseniors-260423/CLCSeniors260423.mp3"
+            links: [
+                { label: "LISTEN NOW", url: "https://ia600604.us.archive.org/16/items/clcseniors-260423/CLCSeniors260423.mp3" }
+            ]
         },
         {
             id: "sign4",
@@ -342,15 +369,20 @@
             title: "神蹟與真神 5｜神蹟四：不只是五餅二魚",
             verse: "📖約6:1-15",
             desc: "Believe，因為耶穌要使你的生命豐富有餘，更要救你脫離罪的轄制！",
-            url: "https://dn721501.ca.archive.org/0/items/clcseniors-260514/CLCSeniors260514.mp3"
+            links: [
+                { label: "LISTEN NOW", url: "https://dn721501.ca.archive.org/0/items/clcseniors-260514/CLCSeniors260514.mp3" }
+            ]
         },
         {
-            id: "iam1-1",
-            chapter: "I AM 01-1",
-            title: "神蹟與真神 6｜真神宣告一：我就是生命的糧(上)",
+            id: "iam1",
+            chapter: "I AM 01",
+            title: "神蹟與真神 6｜真神宣告一：我就是生命的糧",
             verse: "📖約6:25-59",
-            desc: "耶穌就是生命的糧，生命的滿足從尋求祂開始。",
-            url: "https://ia601505.us.archive.org/29/items/clcseniors-260528/CLCSeniors260528.mp3"
+            desc: "耶穌就是生命的糧，唯有祂常在我們裡面才有真滿足。",
+            links: [
+                { label: "PART A", url: "https://ia601505.us.archive.org/29/items/clcseniors-260528/CLCSeniors260528.mp3" },
+                { label: "PART B", url: "https://ia903104.us.archive.org/7/items/clcseniors-260611/CLCSeniors260611.mp3" }
+            ]
         }
     ];
 
@@ -359,22 +391,37 @@
         if (!container) return;
 
         container.innerHTML = sermons.map((s, index) => {
-            const cleanUrl = decodeURIComponent(s.url).trim();
-            const isAudio = cleanUrl.toLowerCase().endsWith('.mp3');
-            
-            // MODIFIED: Wrapped native audio component inside an structural wrapper containing a visual loader element
-            const actionElement = isAudio 
-                ? `<div class="audio-player-container" id="player-zone-${s.id}">
-                    <div class="audio-wrapper">
-                        <audio id="audio-${s.id}" src="${s.url}" controls preload="metadata">
-                            Your browser does not support the audio element.
-                        </audio>
-                        <div class="audio-loader">
-                            <div class="spinner-circle"></div>
-                        </div>
-                    </div>
-                   </div>`
-                : `<a href="${s.url}" class="play-button" target="_blank">Listen Now</a>`;
+            const actionElement = `
+                <div class="audio-player-container" id="player-zone-${s.id}">
+                    ${s.links.map((link, idx) => {
+                        const isMulti = s.links.length > 1;
+                        const partLabelMarkup = isMulti ? `<span class="part-label">${link.label}</span>` : '';
+                        
+                        const cleanUrl = decodeURIComponent(link.url).trim();
+                        const isAudio = cleanUrl.toLowerCase().endsWith('.mp3');
+                        
+                        return isAudio 
+                            ? `
+                            <div class="audio-track-item">
+                                ${partLabelMarkup}
+                                <div class="audio-wrapper">
+                                    <audio id="audio-${s.id}-${idx}" src="${link.url}" controls preload="metadata">
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                    <div class="audio-loader">
+                                        <div class="spinner-circle"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            `
+                            : `
+                            <div class="audio-track-item">
+                                ${partLabelMarkup}
+                                <a href="${link.url}" class="play-button" target="_blank">Listen Now</a>
+                            </div>
+                            `;
+                    }).join('')}
+                </div>`;
 
             return `
                 <div class="sermon-card" id="${s.id}" style="transition-delay: ${index * 0.1}s">
@@ -394,7 +441,6 @@
         }, 100);
     }
 
-    // MODIFIED: Combined Mutex, Android engine rescue, and UI loader events cleanly
     function setupAudioEngine() {
         const audios = document.querySelectorAll('audio');
         
@@ -405,7 +451,6 @@
             const showLoader = () => wrapper.classList.add('is-loading');
             const hideLoader = () => wrapper.classList.remove('is-loading');
 
-            // 1. Core playback state managers & Android Rescue hooks
             audio.addEventListener('play', function() {
                 audios.forEach(otherAudio => {
                     if (otherAudio !== audio) {
@@ -429,13 +474,11 @@
                 }
             });
 
-            // 2. Event listeners for turning ON the loading indicator
             audio.addEventListener('seeking', showLoader);
             audio.addEventListener('waiting', showLoader);
             audio.addEventListener('stalled', showLoader);
             audio.addEventListener('loadstart', showLoader);
 
-            // 3. Event listeners for turning OFF the loading indicator
             audio.addEventListener('playing', hideLoader);
             audio.addEventListener('canplay', hideLoader);
             audio.addEventListener('pause', hideLoader);
@@ -447,7 +490,8 @@
         const hash = window.location.hash;
         if (hash) {
             const targetId = hash.replace('#', '');
-            const audioElement = document.getElementById(`audio-${targetId}`);
+            // 優先尋找卡片的第一個音軌（例如：audio-iam1-0）作爲自動播放對象
+            const audioElement = document.getElementById(`audio-${targetId}-0`) || document.getElementById(`audio-${targetId}`);
             const cardElement = document.getElementById(targetId);
             const playerZone = document.getElementById(`player-zone-${targetId}`);
             
