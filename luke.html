@@ -3,248 +3,490 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bible Study | 信息彙整</title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <title>路加福音系列 | Bible Study</title>
+    
     <style>
         :root {
-            /* LV 經典色系 */
-            --lv-dark-brown: #3d2b1f; /* 深巧克力褐 */
-            --lv-light-brown: #6b4f3b; /* 淺褐 */
-            --lv-gold: #c5a059;       /* 經典金 */
-            --lv-beige: #f4ece1;      /* 米杏色底 */
-            --white: #ffffff;
+            /* Warm sunset/dusk palette extracted from the Luke cover photo */
+            --luke-accent: #e2b96c;      /* Golden Sand/Text Yellow */
+            --luke-dark: #221219;        /* Deep Twilight Maroon */
+            --luke-wine: #3a1c28;        /* Dark Warm Purple/Crimson */
+            --luke-amber: #d68048;       /* Horizon Amber */
+            --glass-white: rgba(255, 255, 255, 0.95);
+            --text-main: #333333;
         }
 
-        html { scroll-behavior: smooth; }
+        html { 
+            scroll-behavior: smooth; 
+            height: 100%; 
+        }
 
         body {
             font-family: 'Arial', 'Helvetica', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: var(--lv-beige);
-            color: var(--lv-dark-brown);
+            color: var(--text-main);
+            background-color: var(--luke-dark); 
+            background-image: url('Luke15-Prodigal_bg.jpg'); 
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            background-size: cover;
+            line-height: 1.6;
+            min-height: 100%; 
+        }
+
+        .overlay {
+            background: linear-gradient(180deg, rgba(34, 18, 25, 0.55) 0%, rgba(20, 10, 15, 0.75) 100%); 
+            min-height: 100vh;
+            width: 100%;
+            padding: 60px 20px;
+            box-sizing: border-box; 
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
         }
 
         .header {
             text-align: center;
-            padding: 80px 20px;
-            background: linear-gradient(135deg, var(--lv-dark-brown), var(--lv-light-brown));
-            color: var(--lv-gold);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            border-bottom: 3px solid var(--lv-gold);
-            /* Added for pattern positioning */
-            position: relative;
-            overflow: hidden;
+            margin-bottom: 50px;
         }
 
-        /* Engraved Pattern Layer */
-        .header::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            /* Subtle cross pattern */
-            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 10v20M10 20h20' stroke='%23000' stroke-width='1' opacity='0.15' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-            background-size: 40px 40px;
-            mix-blend-mode: overlay;
-            pointer-events: none;
-        }
-
-        .header h1 {
+        .header h1 { 
             font-family: 'Arial', sans-serif;
-            font-size: clamp(2.5rem, 8vw, 4rem);
-            margin: 0;
-            letter-spacing: 0; 
-            font-weight: 700;
+            font-size: clamp(2.4rem, 6vw, 3.8rem); 
+            margin: 0; 
+            color: #ffffff; 
+            line-height: 1.1;
+            letter-spacing: 8px;
+            font-weight: 800;
             text-transform: uppercase;
-            /* Ensure text stays above pattern */
-            position: relative;
-            z-index: 1;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
-        .header p {
-            font-family: 'Arial', sans-serif;
-            font-size: clamp(1.25rem, 4vw, 2rem); 
-            opacity: 0.9;
+        .header p { 
+            font-size: clamp(1rem, 2.5vw, 1.4rem); 
             margin-top: 15px;
-            color: var(--lv-beige);
-            letter-spacing: 2px;
             font-weight: 600;
-            /* Ensure text stays above pattern */
-            position: relative;
-            z-index: 1;
+            letter-spacing: 2px;
+            color: var(--luke-accent);
+            text-shadow: 0 2px 6px rgba(0,0,0,0.5);
         }
 
         .container {
-            max-width: 1100px;
-            margin: -50px auto 60px;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 40px;
-            width: 100%;
-            box-sizing: border-box;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%; 
         }
 
-        .study-card {
-            background: var(--white);
-            border-radius: 4px; 
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(61, 43, 31, 0.15);
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid rgba(197, 160, 89, 0.2);
+        .sermon-card {
+            background: var(--glass-white);
+            backdrop-filter: blur(8px);
+            border-radius: 4px;
+            padding: 35px;
+            margin-bottom: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+            border-left: 8px solid var(--luke-accent);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
         }
 
-        .study-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 50px rgba(61, 43, 31, 0.25);
-            border-color: var(--lv-gold);
+        .sermon-card.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .card-image {
-            aspect-ratio: 16 / 9;
-            width: 100%;
-            height: auto;
-            background-size: contain; 
-            background-repeat: no-repeat;
-            background-position: center;
-            background-color: var(--lv-dark-brown);
-            position: relative;
-            border-bottom: 2px solid var(--lv-gold);
+        .sermon-card:target {
+            box-shadow: 0 0 25px rgba(226, 185, 108, 0.8);
+            border-left-color: var(--luke-amber);
+            background: #ffffff;
         }
 
-        .card-content {
-            padding: 30px;
-            text-align: center;
-            background: white;
-            flex-grow: 1;
-        }
-
-        .card-content h2 {
+        .chapter-num {
             font-family: 'Arial', sans-serif;
-            margin: 0 0 12px 0;
-            color: var(--lv-dark-brown);
-            font-size: 1.8rem;
-            letter-spacing: 3px;
-            font-weight: 600;
-        }
-
-        .card-content p {
-            color: var(--lv-light-brown);
-            font-size: 1rem;
-            margin: 0;
-        }
-
-        .btn {
-            font-family: 'Arial', sans-serif;
-            margin-top: 25px;
-            display: inline-block;
-            padding: 12px 40px;
-            background: var(--lv-dark-brown);
-            color: var(--lv-gold);
-            border: 1px solid var(--lv-gold);
-            font-weight: bold;
-            text-transform: uppercase;
+            color: var(--luke-amber);
+            font-weight: 700;
             font-size: 0.85rem;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 8px;
             letter-spacing: 2px;
-            transition: 0.3s;
         }
 
-        .study-card:hover .btn {
-            background: var(--lv-gold);
-            color: var(--lv-dark-brown);
+        .sermon-title {
+            font-size: 1.6rem;
+            margin: 0 0 4px 0; 
+            color: var(--luke-wine);
+            font-weight: 700;
         }
 
-        footer {
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            padding: 50px;
-            margin-top: auto;
-            background: var(--lv-dark-brown);
-            color: var(--lv-gold);
-            font-size: 0.8rem;
+        .bible-verse {
+            font-size: 1.2rem;
+            color: #555;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            display: block;
+        }
+
+        .description {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            white-space: pre-line;
+        }
+
+        .audio-player-container {
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .audio-track-item {
+            margin-bottom: 14px;
+            width: 100%;
+        }
+        .audio-track-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .part-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--luke-wine);
+            display: block;
+            margin-bottom: 5px;
             letter-spacing: 1px;
         }
 
-        /* 背景圖片連結 */
-        .bg-jonah { background-image: url('Jonah_bg.jpg'); }
-        .bg-esther { background-image: url('Esther_bg.jpg'); }
-        .bg-luke { background-image: url('Luke15-Prodigal_bg.jpg'); }
-        .bg-galatians { background-image: url('Galatians_bg.jpg'); }
-        .bg-john { background-image: url('John-Believe_bg.jpg'); }
+        .audio-wrapper {
+            position: relative;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        audio {
+            width: 100%;
+            outline: none;
+            display: block;
+        }
+
+        .audio-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(34, 18, 25, 0.5); 
+            backdrop-filter: blur(1px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none; 
+            transition: opacity 0.2s ease;
+            z-index: 5;
+            border-radius: 4px;
+        }
+
+        .audio-wrapper.is-loading .audio-loader {
+            opacity: 1;
+        }
+
+        .audio-wrapper.is-loading {
+            box-shadow: 0 0 12px rgba(226, 185, 108, 0.6);
+        }
+
+        .spinner-circle {
+            width: 26px;
+            height: 26px;
+            border: 3px solid rgba(226, 185, 108, 0.2);
+            border-top: 3px solid var(--luke-accent);
+            border-radius: 50%;
+            animation: audio-spin 0.8s linear infinite;
+        }
+
+        @keyframes audio-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .play-button {
+            font-family: 'Arial', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--luke-wine);
+            color: var(--luke-accent);
+            text-decoration: none;
+            padding: 14px 24px;
+            border-radius: 2px;
+            border: 1px solid var(--luke-accent);
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            width: 100%;
+            box-sizing: border-box;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .play-button:hover {
+            background-color: var(--luke-accent);
+            color: var(--luke-dark);
+            transform: translateY(-2px);
+        }
+
+        .autoplay-hint-btn {
+            background-color: var(--luke-wine);
+            color: var(--luke-accent);
+            border: 1px solid var(--luke-accent);
+            animation: pulse 1.5s infinite;
+        }
+        .autoplay-hint-btn:hover {
+            background-color: var(--luke-accent);
+            color: var(--luke-dark);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(226, 185, 108, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(226, 185, 108, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(226, 185, 108, 0); }
+        }
+
+        .home-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 12px 22px;
+            background-color: var(--luke-wine);
+            color: var(--luke-accent);
+            border: 1px solid var(--luke-accent);
+            border-radius: 4px;
+            text-decoration: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            font-family: 'Arial', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .home-btn:hover {
+            transform: translateY(-5px);
+            background-color: var(--luke-accent);
+            color: var(--luke-dark);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        }
+
+        footer {
+            text-align: center;
+            color: #ffffff;
+            padding: 60px 20px;
+            margin-top: auto; 
+            font-family: 'Arial', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+        }
 
         @media (max-width: 600px) {
-            .header { padding: 50px 20px; }
-            .container { margin-top: -30px; gap: 25px; }
+            .home-btn { 
+                bottom: 20px; 
+                right: 20px; 
+                padding: 10px 18px;
+                font-size: 0.75rem;
+            }
         }
     </style>
 </head>
 <body>
 
+<a href="index.html" class="home-btn" title="Back to Main">HOME</a>
+
+<div class="overlay">
     <header class="header">
-        <h1>BIBLE STUDY PORTAL</h1>
-        <p>信息彙整</p>
+        <h1>LUKE</h1>
+        <p>路加福音：等你回家 HEADING HOME</p>
     </header>
 
-    <div class="container">
-        <a href="esther.html" class="study-card">
-            <div class="card-image bg-esther"></div>
-            <div class="card-content">
-                <h2>ESTHER</h2>
-                <p>聽天不由命 X 我為此而生</p>
-                <div class="btn">Explore Series</div>
-            </div>
-        </a>
-
-        <a href="jonah.html" class="study-card">
-            <div class="card-image bg-jonah"></div>
-            <div class="card-content">
-                <h2>JONAH</h2>
-                <p>愛與給人機會的神</p>
-                <div class="btn">Explore Series</div>
-            </div>
-        </a>
-
-        <a href="luke.html" class="study-card">
-            <div class="card-image bg-luke"></div>
-            <div class="card-content">
-                <h2>LUKE</h2>
-                <p>HEADING HOME 等你回家</p>
-                <div class="btn">Explore Series</div>
-            </div>
-        </a>
-
-        <a href="john-believe.html" class="study-card">
-            <div class="card-image bg-john"></div>
-            <div class="card-content">
-                <h2>JOHN</h2>
-                <p>⑦Believe｜Signs X I AM</p>
-                <div class="btn">Explore Series</div>
-            </div>
-        </a>
-
-        <a href="galatians.html" class="study-card">
-            <div class="card-image bg-galatians"></div>
-            <div class="card-content">
-                <h2>GALATIANS</h2>
-                <p>GOSPEL original✝ 正港的福音</p>
-                <div class="btn">Explore Series</div>
-            </div>
-        </a>
-    </div>
+    <div class="container" id="sermon-container"></div>
 
     <footer>
-        &copy; BIBLE STUDY PORTAL | SINCE 2022
+        <p>&copy; BIBLE STUDY PORTAL | LUKE SERIES</p>
     </footer>
+</div>
+
+<script>
+    const sermons = [
+        {
+            id: "heading-home",
+            chapter: "LUKE 15",
+            title: "Heading Home 等你回家",
+            verse: "📖路15:11-32",
+            desc: "看見慈愛父神敞開的心與家門，無論你在哪裡，祂都在等候你歸家。",
+            links: [
+                { id: "heading-home-a", label: "LISTEN NOW", url: "https://ia902908.us.archive.org/9/items/clcseniors-260723/CLCSeniors%20260723.mp3" }
+            ]
+        }
+    ];
+
+    function renderSermons() {
+        const container = document.getElementById('sermon-container');
+        if (!container) return;
+
+        container.innerHTML = sermons.map((s, index) => {
+            const actionElement = `
+                <div class="audio-player-container" id="player-zone-${s.id}">
+                    ${s.links.map((link) => {
+                        const isMulti = s.links.length > 1;
+                        const partLabelMarkup = isMulti ? `<span class="part-label">${link.label}</span>` : '';
+                        
+                        const cleanUrl = decodeURIComponent(link.url).trim();
+                        const isAudio = cleanUrl.toLowerCase().endsWith('.mp3');
+                        
+                        return isAudio 
+                            ? `
+                            <div class="audio-track-item">
+                                ${partLabelMarkup}
+                                <div class="audio-wrapper">
+                                    <audio id="audio-${link.id}" src="${link.url}" controls preload="metadata">
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                    <div class="audio-loader">
+                                        <div class="spinner-circle"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            `
+                            : `
+                            <div class="audio-track-item">
+                                ${partLabelMarkup}
+                                <a href="${link.url}" class="play-button" target="_blank">Listen Now</a>
+                            </div>
+                            `;
+                    }).join('')}
+                </div>`;
+
+            return `
+                <div class="sermon-card" id="${s.id}" style="transition-delay: ${index * 0.1}s">
+                    <span class="chapter-num">${s.chapter}</span>
+                    <h2 class="sermon-title">${s.title}</h2>
+                    <span class="bible-verse">${s.verse}</span>
+                    <p class="description">${s.desc}</p>
+                    ${actionElement}
+                </div>
+            `;
+        }).join('');
+
+        setTimeout(() => {
+            document.querySelectorAll('.sermon-card').forEach(card => card.classList.add('visible'));
+            setupAudioEngine(); 
+            handleAutoplayFromHash();
+        }, 100);
+    }
+
+    function setupAudioEngine() {
+        const audios = document.querySelectorAll('audio');
+        
+        audios.forEach(audio => {
+            const wrapper = audio.closest('.audio-wrapper');
+            if (!wrapper) return;
+
+            const showLoader = () => wrapper.classList.add('is-loading');
+            const hideLoader = () => wrapper.classList.remove('is-loading');
+
+            audio.addEventListener('play', function() {
+                audios.forEach(otherAudio => {
+                    if (otherAudio !== audio) {
+                        otherAudio.pause();
+                    }
+                });
+
+                if (audio.dataset.androidFixing === "true") return;
+
+                if (audio.readyState <= 1) {
+                    audio.dataset.androidFixing = "true";
+                    const currentPos = audio.currentTime;
+                    showLoader();
+                    
+                    audio.load(); 
+                    audio.currentTime = currentPos; 
+                    
+                    audio.play()
+                        .then(() => { audio.dataset.androidFixing = "false"; })
+                        .catch(() => { audio.dataset.androidFixing = "false"; });
+                }
+            });
+
+            audio.addEventListener('seeking', showLoader);
+            audio.addEventListener('waiting', showLoader);
+            audio.addEventListener('stalled', showLoader);
+            audio.addEventListener('loadstart', showLoader);
+
+            audio.addEventListener('playing', hideLoader);
+            audio.addEventListener('canplay', hideLoader);
+            audio.addEventListener('pause', hideLoader);
+            audio.addEventListener('seeked', hideLoader);
+        });
+    }
+
+    function handleAutoplayFromHash() {
+        const hash = window.location.hash;
+        if (hash) {
+            const targetId = hash.replace('#', '');
+            
+            let cardElement = document.getElementById(targetId);
+            let audioElement = null;
+            
+            if (cardElement && cardElement.classList.contains('sermon-card')) {
+                audioElement = cardElement.querySelector('audio');
+            } else {
+                audioElement = document.getElementById(`audio-${targetId}`);
+                if (audioElement) {
+                    cardElement = audioElement.closest('.sermon-card');
+                }
+            }
+            
+            if (cardElement) {
+                cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                if (audioElement) {
+                    const playerZone = cardElement.querySelector('.audio-player-container');
+                    const oldBtn = document.getElementById(`hint-btn-${targetId}`);
+                    if (oldBtn) oldBtn.remove();
+
+                    audioElement.play().catch(error => {
+                        console.log("自動播放被瀏覽器政策攔截，生成引導按鈕。");
+                        
+                        const hintBtn = document.createElement('button');
+                        hintBtn.id = `hint-btn-${targetId}`;
+                        hintBtn.className = 'play-button autoplay-hint-btn';
+                        
+                        let labelText = targetId.toUpperCase();
+                        hintBtn.innerHTML = `▶ PLAY ${labelText}`;
+                        
+                        hintBtn.onclick = function() {
+                            audioElement.play();
+                            hintBtn.remove(); 
+                        };
+                        
+                        if (playerZone) {
+                            playerZone.insertBefore(hintBtn, playerZone.firstChild);
+                        }
+                    });
+                }
+            }
+        }
+    }
+
+    window.onload = renderSermons;
+    window.onhashchange = handleAutoplayFromHash;
+</script>
 
 </body>
 </html>
