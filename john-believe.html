@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -131,7 +132,7 @@
             margin-bottom: 25px;
             border-bottom: 1px solid #eee;
             padding-bottom: 15px;
-            white-space: pre-line; /* Added to respect \n line breaks */
+            white-space: pre-line; /* Respects \n line breaks */
         }
 
         .audio-player-container {
@@ -139,7 +140,6 @@
             width: 100%;
         }
 
-        /* 支援多音軌卡片的內部排版樣式 */
         .audio-track-item {
             margin-bottom: 14px;
             width: 100%;
@@ -157,7 +157,6 @@
             letter-spacing: 1px;
         }
 
-        /* Audio Wrapper & Custom Loading Indicator styles */
         .audio-wrapper {
             position: relative;
             width: 100%;
@@ -176,7 +175,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(26, 26, 26, 0.5); /* Semi-transparent matching dark theme */
+            background: rgba(26, 26, 26, 0.5);
             backdrop-filter: blur(1px);
             display: flex;
             align-items: center;
@@ -188,7 +187,6 @@
             border-radius: 4px;
         }
 
-        /* Active buffering state */
         .audio-wrapper.is-loading .audio-loader {
             opacity: 1;
         }
@@ -322,14 +320,13 @@
 </div>
 
 <script>
-    // 全面升級為與包含獨立 id 的 track 級架構
     const sermons = [
         {
             id: "intro",
             chapter: "INTRODUCTION",
             title: "神蹟與真神 1｜介紹：使你能相信",
             verse: "📖約20:31",
-            desc: "明白約翰福音的核心目的：叫你們信耶穌是基督，是神的兒子。",
+            desc: "7 Signs 神蹟＆ 7 I AM 真神宣告，讓我們認識耶穌，使我們能夠 Believe！",
             links: [
                 { id: "intro-a", label: "LISTEN NOW", url: "https://ia903107.us.archive.org/17/items/clcseniors-251127/CLCSeniors251127.mp3" }
             ]
@@ -393,6 +390,16 @@
             desc: "Believe The Great I AM \n相信真神耶穌，讓祂接管你的人生，勝過生、死、成敗的一切恐懼！",
             links: [
                 { id: "sign5-a", label: "LISTEN NOW", url: "https://ia601507.us.archive.org/21/items/clcseniors-260625_202606/CLCSeniors260625.mp3" }
+            ]
+        },
+        {
+            id: "iam2",
+            chapter: "I AM 02",
+            title: "神蹟與真神 8｜真神宣告二：我是世界的光",
+            verse: "📖約8:12-30",
+            desc: "耶穌就是世界的光，跟從祂的就不在黑暗裡走，必要得著生命的光。",
+            links: [
+                { id: "iam2-a", label: "LISTEN NOW", url: "https://ia601607.us.archive.org/25/items/clcseniors-260917_202609/CLCSeniors260917.mp3" }
             ]
         }
     ];
@@ -505,12 +512,9 @@
             let cardElement = document.getElementById(targetId);
             let audioElement = null;
             
-            // 判斷錨點是直接指向字卡卡片還是特定音軌
             if (cardElement && cardElement.classList.contains('sermon-card')) {
-                // 如果是指向卡片 (例如 #iam1)，預設抓卡片內的第一個播放器
                 audioElement = cardElement.querySelector('audio');
             } else {
-                // 如果是指向音軌 (例如 #iam1-b)，直接抓取對應音訊元件
                 audioElement = document.getElementById(`audio-${targetId}`);
                 if (audioElement) {
                     cardElement = audioElement.closest('.sermon-card');
@@ -532,7 +536,6 @@
                         hintBtn.id = `hint-btn-${targetId}`;
                         hintBtn.className = 'play-button autoplay-hint-btn';
                         
-                        // 根據傳入的 ID 動態決定提示按鈕上顯示的文字
                         let labelText = targetId.toUpperCase();
                         if (labelText.includes('IAM1-')) {
                             labelText = labelText.replace('IAM1-', 'PART ');
@@ -561,3 +564,5 @@
 
 </body>
 </html>
+
+```
