@@ -131,7 +131,7 @@
             margin-bottom: 25px;
             border-bottom: 1px solid #eee;
             padding-bottom: 15px;
-            white-space: pre-line; /* Respects \n line breaks */
+            white-space: pre-line;
         }
 
         .audio-player-container {
@@ -233,6 +233,24 @@
             background-color: var(--john-gold);
             color: white;
             transform: translateY(-2px);
+        }
+        
+        /* 待續狀態的設計 */
+        .pending-box {
+            font-family: 'Arial', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.03);
+            color: #888;
+            padding: 14px 24px;
+            border-radius: 2px;
+            border: 1px dashed #bbb;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .autoplay-hint-btn {
@@ -408,7 +426,8 @@
             verse: "📖約9:1-41",
             desc: "信心是一趟旅程，相信就會看見神的作為",
             links: [
-                { id: "sign6-a", label: "PART A", url: "https://ia601404.us.archive.org/32/items/clcseniors-261008/CLCSeniors%20261008.mp3" }
+                { id: "sign6-a", label: "PART A", url: "https://ia601404.us.archive.org/32/items/clcseniors-261008/CLCSeniors%20261008.mp3" },
+                { id: "sign6-b", label: "PART B", url: "pending" }
             ]
         }
     ];
@@ -423,6 +442,16 @@
                     ${s.links.map((link) => {
                         const isMulti = s.links.length > 1;
                         const partLabelMarkup = isMulti ? `<span class="part-label">${link.label}</span>` : '';
+                        
+                        // 處理待續狀態
+                        if (link.url === 'pending') {
+                            return `
+                            <div class="audio-track-item">
+                                ${partLabelMarkup}
+                                <div class="pending-box">(待續)</div>
+                            </div>
+                            `;
+                        }
                         
                         const cleanUrl = decodeURIComponent(link.url).trim();
                         const isAudio = cleanUrl.toLowerCase().endsWith('.mp3');
