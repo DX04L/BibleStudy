@@ -1,19 +1,9 @@
-約翰福音 11 章講章筆記網站 prototype
+約翰福音11章講章研究工作區（靜態版）
 
-檔案：
-- index.html：主頁
-- js/app.js：頁面內容、切換、編輯、本機儲存、匯出/匯入
+使用方式：直接開 index.html，或整包部署到 Cloudflare Pages。\n功能：系列頁面導覽、手機導覽、全站搜尋、編輯本頁、儲存至 localStorage、深淺色、JSON 匯出／匯入、收合提醒區、頁面間互動導覽。
 
-目前：
-- 靜態 HTML/CSS/JS，無需 build
-- 直接編輯模式：點「編輯」後點選文字，修改後按「儲存」
-- 本機 localStorage 暫存
-- JSON 匯出與匯入
-- 深淺模式
-- 手機/桌機 responsive
-- 導覽、搜尋與 reminders/details 收合
+資料保存：目前只存於使用者瀏覽器 localStorage，尚未雲端同步。資料 key：clc_john11_notes_v2。未來可把 store/load/saveAll 封裝替換成 Firestore adapter。
 
-未來資料庫：
-目前的資料以 pages object / localStorage 儲存。Firebase Firestore 接入時，可將讀寫函式替換為 Firestore adapter，頁面 UI 不必重寫。建議每篇 sermon/page 以 key 儲存 HTML 或後續轉成 blocks 結構，保留 section/reminder 分層。
+重要：本版以已討論內容為基礎，第三篇仍保留「尚待深化」狀態，提醒與神學備忘預設收合，避免當成講章正文。原第一篇開場文字保留。
 
-部署：直接放 Cloudflare Pages 或任意靜態主機即可。檔案路徑皆相對。
+部署：Cloudflare Pages 靜態部署，根目錄指定本資料夾；路徑皆相對。
