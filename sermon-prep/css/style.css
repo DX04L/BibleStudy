@@ -10,7 +10,12 @@
   --accent2: #dcefeb;
   --line: #e9ddd6;
   --peach: #ffede5;
+  --theo-bg: #fdf6ec;
+  --theo-border: #d99b52;
+  --theo-ink: #8a5216;
+  --danger: #c0392b;
   --shadow: 0 8px 28px rgba(33, 66, 74, 0.05);
+  --bubble-shadow: 0 18px 48px rgba(23, 40, 43, 0.24);
 }
 
 html.dark {
@@ -22,7 +27,12 @@ html.dark {
   --accent2: #29494d;
   --line: #38545a;
   --peach: #493b37;
+  --theo-bg: #2e2922;
+  --theo-border: #d49b54;
+  --theo-ink: #f3c486;
+  --danger: #e57373;
   --shadow: 0 8px 28px rgba(0, 0, 0, 0.15);
+  --bubble-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
 }
 
 /* ==========================================================================
@@ -57,7 +67,8 @@ a {
 }
 
 button,
-input {
+input,
+textarea {
   font: inherit;
   color: inherit;
 }
@@ -69,7 +80,7 @@ button {
   border-radius: 12px;
   padding: 8px 12px;
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
 }
 
 button:hover {
@@ -232,6 +243,51 @@ main {
 }
 
 /* ==========================================================================
+   編輯工具列 (Edit Mode Toolbar)
+   ========================================================================== */
+.editbar {
+  position: sticky;
+  top: 10px;
+  z-index: 50;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  background: var(--theo-bg);
+  border: 1.5px solid var(--theo-border);
+  border-radius: 14px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+
+.editbar[hidden] {
+  display: none !important;
+}
+
+.edit-action-btn {
+  min-height: 36px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--surface);
+  color: var(--theo-ink);
+  border: 1px solid var(--theo-border);
+  border-radius: 10px;
+}
+
+.edit-action-btn:hover {
+  background: var(--theo-border);
+  color: #ffffff;
+}
+
+.edithelp {
+  font-size: 12px;
+  color: var(--muted);
+  flex: 1 1 240px;
+}
+
+/* ==========================================================================
    文章閱讀區與元件 (Article & Components)
    ========================================================================== */
 .article {
@@ -241,6 +297,16 @@ main {
   border-radius: 20px;
   padding: clamp(18px, 3.3vw, 34px);
   box-shadow: var(--shadow);
+}
+
+.article.editing {
+  outline: 2px dashed var(--accent);
+  outline-offset: 4px;
+}
+
+.article.editing [data-theo] {
+  cursor: pointer;
+  box-shadow: 0 0 0 2px rgba(217, 155, 82, 0.35);
 }
 
 .article h2 {
@@ -255,8 +321,12 @@ main {
 
 .article h4 {
   font-size: 16px;
-  margin: 20px 0 6px;
+  margin: 22px 0 6px;
   color: var(--accent);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
 }
 
 .article p {
@@ -274,7 +344,7 @@ main {
   padding: 13px 16px;
   border-radius: 0 12px 12px 0;
   margin: 12px 0 16px;
-  line-height: 1.78;
+  line-height: 1.82;
 }
 
 .scripture strong {
@@ -300,6 +370,273 @@ main {
   margin: 2px 4px 2px 0;
 }
 
+/* ==========================================================================
+   神學重點觸發按鈕與文中詞條標記 (Theological Note Triggers)
+   ========================================================================== */
+.theo-term {
+  display: inline;
+  background: none;
+  border: 0;
+  border-bottom: 1.5px dashed var(--theo-border);
+  border-radius: 3px;
+  padding: 0 2px;
+  min-height: auto;
+  color: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.theo-term:hover,
+.theo-term:focus-visible {
+  background: var(--theo-bg);
+  color: var(--theo-ink);
+  border-bottom-style: solid;
+}
+
+.theo-term::after {
+  content: " ✦";
+  font-size: 0.78em;
+  color: var(--theo-ink);
+  vertical-align: super;
+}
+
+.theo-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 999px;
+  background: var(--theo-bg);
+  color: var(--theo-ink);
+  border: 1px solid var(--theo-border);
+  cursor: pointer;
+}
+
+.theo-tag:hover {
+  background: var(--theo-border);
+  color: #ffffff;
+}
+
+.theo-footer-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: -6px 0 18px;
+}
+
+/* ==========================================================================
+   神學重點彈出氣泡視窗 & 表單 (Pop-up Bubble & Form)
+   ========================================================================== */
+.theo-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 40, 43, 0.35);
+  backdrop-filter: blur(2px);
+  z-index: 199;
+}
+
+.theo-backdrop[hidden],
+.theo-bubble[hidden],
+#theo-view-mode[hidden],
+#theo-edit-form[hidden],
+#theo-view-actions[hidden],
+#theo-delete-btn[hidden] {
+  display: none !important;
+}
+
+.theo-bubble {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(580px, calc(100vw - 28px));
+  max-height: min(84vh, 720px);
+  overflow-y: auto;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1.5px solid var(--theo-border);
+  border-top: 5px solid var(--theo-border);
+  border-radius: 18px;
+  padding: 18px 20px 20px;
+  box-shadow: var(--bubble-shadow);
+  z-index: 200;
+  animation: bubblePop 0.16s ease-out;
+}
+
+@keyframes bubblePop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -47%) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.theo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.theo-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--theo-bg);
+  color: var(--theo-ink);
+  border: 1px solid var(--theo-border);
+}
+
+.theo-close {
+  min-height: 32px;
+  width: 32px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theo-title {
+  margin: 4px 0 10px;
+  font-size: 18px;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.theo-body {
+  font-size: 14.5px;
+  line-height: 1.72;
+}
+
+.theo-body p {
+  margin: 8px 0;
+}
+
+.theo-body ul,
+.theo-body ol {
+  margin: 6px 0 10px;
+  padding-left: 20px;
+}
+
+.theo-body li {
+  margin: 5px 0;
+}
+
+.theo-consensus {
+  background: var(--accent2);
+  border-left: 3.5px solid var(--accent);
+  padding: 9px 12px;
+  border-radius: 0 10px 10px 0;
+  margin: 10px 0;
+}
+
+.theo-views {
+  background: var(--theo-bg);
+  border-left: 3.5px solid var(--theo-border);
+  padding: 9px 12px;
+  border-radius: 0 10px 10px 0;
+  margin: 10px 0;
+}
+
+.theo-actions {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 氣泡表單樣式 */
+.theo-form .form-group {
+  margin-bottom: 12px;
+}
+
+.theo-form label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.theo-form input,
+.theo-form textarea {
+  width: 100%;
+  padding: 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--bg);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.theo-form input:focus,
+.theo-form textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+.theo-form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.theo-form-right {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.theo-btn-primary {
+  background: var(--accent);
+  color: #ffffff;
+  border-color: var(--accent);
+  font-weight: 700;
+  min-height: 38px;
+  padding: 6px 14px;
+}
+
+.theo-btn-primary:hover {
+  opacity: 0.92;
+  color: #ffffff;
+}
+
+.theo-btn-danger {
+  color: var(--danger);
+  border-color: var(--danger);
+  background: transparent;
+  min-height: 38px;
+  padding: 6px 12px;
+}
+
+.theo-btn-danger:hover {
+  background: var(--danger);
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   折疊備忘與次導覽 (Fold & Subnav)
+   ========================================================================== */
 .fold {
   border: 1px dashed var(--line);
   border-radius: 13px;
@@ -348,40 +685,6 @@ main {
   margin-top: 8px;
 }
 
-/* ==========================================================================
-   編輯模式與狀態提示 (Edit Mode & Feedback)
-   ========================================================================== */
-.editmode {
-  outline: 2px dashed var(--accent);
-  outline-offset: 5px;
-  border-radius: 5px;
-}
-
-.pagehead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.editbar {
-  display: none;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin: 0 0 15px;
-}
-
-.editing .editbar {
-  display: flex;
-}
-
-.editing [contenteditable="true"] {
-  outline: 1px dashed var(--accent);
-  outline-offset: 3px;
-  border-radius: 3px;
-}
-
-.edithelp,
 .notice {
   font-size: 12px;
   color: var(--muted);
@@ -404,7 +707,7 @@ main {
   padding: 10px 16px;
   border-radius: 12px;
   display: none;
-  z-index: 99;
+  z-index: 250;
 }
 
 /* ==========================================================================
@@ -566,6 +869,11 @@ main {
   .toast {
     max-width: calc(100vw - 24px);
     text-align: center;
+  }
+
+  .theo-bubble {
+    padding: 15px 16px 18px;
+    max-height: 85vh;
   }
 }
 

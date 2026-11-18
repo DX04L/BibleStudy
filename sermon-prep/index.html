@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#fff0e9">
   <title>我就是復活和生命｜講章研究工作區</title>
-  <link rel="stylesheet" href="css/style.css?v=20261119b">
+  <link rel="stylesheet" href="css/style.css?v=20261119d">
 </head>
 <body>
   <div class="wrap">
@@ -31,7 +31,7 @@
     <!-- 主視覺橫幅 -->
     <section class="hero">
       <h1>我就是復活和生命</h1>
-      <p>約翰福音 11章｜三篇信息、經文觀察、神學備忘與系列連結</p>
+      <p>約翰福音 11章｜三篇信息、和合本經文、福音派釋經神學註記與系列連結</p>
     </section>
 
     <!-- 主要內容網格 -->
@@ -50,17 +50,17 @@
         <hr class="divider">
 
         <div class="side-label">搜尋全部資料</div>
-        <input id="search" class="search" type="search" placeholder="搜尋經文、標題、提醒…">
+        <input id="search" class="search" type="search" placeholder="搜尋經文、標題、神學詞條…">
         <div id="results" class="searchresults"></div>
 
-        <p class="notice">資料目前存於本機瀏覽器；資料庫串接預留。</p>
+        <p class="notice">閱讀時點擊「✦」詞條可查看釋經氣泡；點擊「編輯本頁」可反白文字新增或修改神學氣泡。</p>
       </aside>
 
       <!-- 主閱讀與編輯區 -->
       <main>
         <!-- 手機端搜尋列 -->
         <div class="mobilesearch">
-          <input id="search-mobile" class="search" type="search" placeholder="搜尋經文、標題、提醒…">
+          <input id="search-mobile" class="search" type="search" placeholder="搜尋經文、標題、神學詞條…">
           <div id="results-mobile" class="searchresults"></div>
         </div>
 
@@ -73,6 +73,13 @@
           <button class="nav" data-page="notes">備忘</button>
         </nav>
 
+        <!-- 編輯模式專用懸浮工具列 -->
+        <div id="edit-bar" class="editbar" hidden>
+          <button type="button" id="add-theo-term" class="edit-action-btn">✦ 為選取文字加神學氣泡</button>
+          <button type="button" id="add-theo-block" class="edit-action-btn">＋ 在游標處插入神學重點標籤</button>
+          <span class="edithelp">提示：在編輯模式下，直接點擊既有的「✦」詞條或標籤即可修改／刪除該氣泡內容。</span>
+        </div>
+
         <!-- 文章內容容器 -->
         <article class="article" id="article">
           <h2>系列總覽</h2>
@@ -84,13 +91,58 @@
 
     <!-- 頁尾資訊 -->
     <footer class="bottom">
-      靜態網站｜本機自動儲存｜JSON 匯出／匯入｜未來可接 Firebase / Firestore
+      靜態網站｜本機自動儲存｜支援自訂神學氣泡與 JSON 完整匯出／匯入
     </footer>
+  </div>
+
+  <!-- 神學重點彈出氣泡框 (閱讀檢視 + 編輯表單雙模式) -->
+  <div id="theo-backdrop" class="theo-backdrop" hidden></div>
+  <div id="theo-bubble" class="theo-bubble" role="dialog" aria-modal="true" aria-labelledby="theo-title" hidden>
+    <div class="theo-header">
+      <span id="theo-badge" class="theo-badge">福音派釋經神學重點</span>
+      <button id="theo-close" class="theo-close" type="button" aria-label="關閉視窗">✕</button>
+    </div>
+
+    <!-- 閱讀模式檢視區 -->
+    <div id="theo-view-mode">
+      <h4 id="theo-title" class="theo-title"></h4>
+      <div id="theo-body" class="theo-body"></div>
+      <div id="theo-view-actions" class="theo-actions" hidden>
+        <button type="button" id="theo-switch-edit" class="theo-btn-primary">✎ 編輯此氣泡內容</button>
+      </div>
+    </div>
+
+    <!-- 編輯／新增氣泡表單區 -->
+    <form id="theo-edit-form" class="theo-form" hidden>
+      <div class="form-group">
+        <label for="theo-input-label">頁面顯示的詞句 / 標籤文字</label>
+        <input id="theo-input-label" type="text" required placeholder="例如：恩典與真理、✦ 本段神學重點">
+      </div>
+      <div class="form-group">
+        <label for="theo-input-title">氣泡視窗標題</label>
+        <input id="theo-input-title" type="text" required placeholder="例如：約 11:25｜「復活在我，生命也在我」">
+      </div>
+      <div class="form-group">
+        <label for="theo-input-consensus">福音派共同核心立場（選填）</label>
+        <textarea id="theo-input-consensus" rows="3" placeholder="輸入保守／福音派學者（如 D. A. Carson, John Stott）共同認同的釋經重點…"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="theo-input-views">不同學術立場或補充神學說明（選填，每行一點）</label>
+        <textarea id="theo-input-views" rows="4" placeholder="若有兩三種不同看法，可分行列出（例如：立場一｜…）"></textarea>
+      </div>
+      <div class="theo-form-footer">
+        <button type="button" id="theo-delete-btn" class="theo-btn-danger" hidden>刪除氣泡</button>
+        <div class="theo-form-right">
+          <button type="button" id="theo-cancel-btn">取消</button>
+          <button type="submit" class="theo-btn-primary">套用並儲存氣泡</button>
+        </div>
+      </div>
+    </form>
   </div>
 
   <!-- 提示訊息氣泡 -->
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/app.js?v=20261119b"></script>
+  <script src="js/app.js?v=20261119d"></script>
 </body>
 </html>
