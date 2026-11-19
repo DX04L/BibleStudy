@@ -36,6 +36,19 @@ const defaultTheoNotes = {
       </div>
     `
   },
+  resurrection_cases: {
+    title: '聖經中死人復生與復活的主要記載｜經文註腳',
+    html: `
+      <div class="theo-consensus">
+        <strong>主要經文（按事件分為10組）：</strong>
+        <p><strong>① 舊約（3例）：</strong>撒勒法寡婦之子（王上17:17–24）、書念婦人之子（王下4:18–37）、觸及以利沙骸骨的死人（王下13:20–21）。</p>
+        <p><strong>② 福音書（3例）：</strong>睚魯的女兒（可5:21–43）、拿因城寡婦的兒子（路7:11–17）、拉撒路（約11:1–44）。</p>
+        <p><strong>③ 耶穌受難與復活（2組）：</strong>耶穌第三日復活（太28:1–10；約20:1–18）；許多已睡聖徒的身體復活，並於耶穌復活後進城顯現（太27:50–53）。</p>
+        <p><strong>④ 使徒行傳（2例）：</strong>大比大／多加（徒9:36–42）、猶推古（徒20:7–12）。</p>
+      </div>
+      <p><strong>神學註記：</strong>以上是10組主要記載，並非只有10個人復活。一般死人復生是恢復今生的生命；耶穌的復活則是進入永不再死的榮耀生命（羅6:9；林前15:20）。馬太福音27章沒有交代復活聖徒後來的情況，不宜直接歸為一般復生。</p>
+    `
+  },
   seventh_sign: {
     title: '第七個神蹟與「我是」(Egō Eimi) 神性宣告',
     html: `
@@ -533,13 +546,36 @@ const theoCancelBtn = document.querySelector('#theo-cancel-btn');
 // ==========================================================================
 // 資料存取與通知提示
 // ==========================================================================
+
+// 在原有頁面及已儲存在本機的舊版本中，補上復活經文註腳入口；不覆蓋使用者編輯的內容。
+function addResurrectionFootnotes(pages) {
+  const footnoteButton = '<button type="button" class="theo-tag" data-theo="resurrection_cases">✦ 註腳：聖經中死人復生與復活的主要記載</button>';
+  const placements = {
+    s1: '<button type="button" class="theo-tag" data-theo="seventh_sign">✦ 神學重點：第七個記號與「我是」宣告</button>',
+    s2: '<button type="button" class="theo-tag" data-theo="s2_p1_iam">✦ 神學議題：「復活在我，生命也在我」與終末論的「已然／未然」</button>',
+    notes: '    <h3>系列連結與待討論</h3>'
+  };
+  for (const [page, anchor] of Object.entries(placements)) {
+    const html = pages[page];
+    if (typeof html !== 'string' || html.includes('data-theo="resurrection_cases"') || !html.includes(anchor)) continue;
+    if (page === 'notes') {
+      pages[page] = html.replace(anchor,
+        '    <h3>聖經中死人復生與復活的記載</h3>\n' +
+        '    <div class="theo-footer-bar">' + footnoteButton + '</div>\n\n' + anchor);
+    } else {
+      pages[page] = html.replace(anchor, anchor + '\n      ' + footnoteButton);
+    }
+  }
+  return pages;
+}
+
 function loadStore() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-    return { ...defaultContent, ...saved };
+    return addResurrectionFootnotes({ ...defaultContent, ...saved });
   } catch (e) {
     console.warn('讀取頁面儲存失敗，載入預設內容：', e);
-    return { ...defaultContent };
+    return addResurrectionFootnotes({ ...defaultContent });
   }
 }
 
