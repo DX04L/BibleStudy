@@ -438,6 +438,21 @@
                 { id: "sign6-b", label: "PART B", url: "https://ia601800.us.archive.org/2/items/clcseniors-261029_202610/CLCSeniors%20261029.mp3" }
             ]
         }
+,
+        {
+            "id": "sign7",
+            "chapter": "SIGN 07 & I AM 02",
+            "title": "神蹟與真神 12｜神蹟七&真神宣告五：我就是復活和生命",
+            "verse": "📖約11:1-44",
+            "desc": "BELIEVE｜信心，需要的是抓住主耶穌，願意與祂同死的一個決定！",
+            "links": [
+                {
+                    "id": "sign7-a",
+                    "label": "PART A 愛與死亡 v1-16",
+                    "url": "https://ia600403.us.archive.org/9/items/clcseniors-261126/CLCSeniors%20261126.mp3"
+                }
+            ]
+        }
     ];
 
     function renderSermons() {
@@ -448,7 +463,7 @@
             const actionElement = `
                 <div class="audio-player-container" id="player-zone-${s.id}">
                     ${s.links.map((link) => {
-                        const isMulti = s.links.length > 1;
+                        const isMulti = s.links.length > 1 || link.label !== 'LISTEN NOW';
                         const partLabelMarkup = isMulti ? `<span class="part-label">${link.label}</span>` : '';
                         
                         // 處理待續狀態
